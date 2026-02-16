@@ -1,0 +1,22 @@
+{
+  "Culture": "en",
+  "Texts": {
+    "Menu:Todos": "Todos",
+    "Todos": "Todos",
+    "Todo": "Todo",
+    "NewTodo": "New Todo",
+    "Title": "Title",
+    "Description": "Description",
+    "IsCompleted": "Completed",
+    "CompletedBy": "Completed By",
+    "CompletedTime": "Completed Time",
+    "CreatedBy": "Created By",
+    "CreationTime": "Creation Time",
+    "Complete": "Complete",
+    "TodoDeletionConfirmation": "Are you sure you want to delete this todo?",
+    "Permission:Todos": "Todo Management",
+    "Permission:Todos.Create": "Create",
+    "Permission:Todos.Edit": "Edit",
+    "Permission:Todos.Delete": "Delete"
+  }
+}

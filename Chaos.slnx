@@ -1,0 +1,25 @@
+<Solution>
+    <Folder Name="/src/features/">
+        <Project Path="src/features/Chaos.Features.Todo/Chaos.Features.Todo.csproj" />
+    </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/Chaos.Domain/Chaos.Domain.csproj" />
+        <Project Path="src/Chaos.Application/Chaos.Application.csproj" />
+        <Project Path="src/Chaos.EntityFrameworkCore/Chaos.EntityFrameworkCore.csproj" />
+        <Project Path="src/Chaos.Domain.Shared/Chaos.Domain.Shared.csproj" />
+        <Project Path="src/Chaos.AppHost/Chaos.AppHost.csproj" />
+        <Project Path="src/Chaos.Application.Contracts/Chaos.Application.Contracts.csproj" />
+        <Project Path="src/Chaos.HttpApi/Chaos.HttpApi.csproj" />
+        <Project Path="src/Chaos.HttpApi.Client/Chaos.HttpApi.Client.csproj" />
+        <Project Path="src/Chaos.DbMigrator/Chaos.DbMigrator.csproj" />
+        <Project Path="src/Chaos.HttpApi.Host/Chaos.HttpApi.Host.csproj" />
+        <Project Path="src/Chaos.ServiceDefaults/Chaos.ServiceDefaults.csproj" />
+    </Folder>
+    <Folder Name="/test/">
+        <Project Path="test/Chaos.Application.Tests/Chaos.Application.Tests.csproj" />
+        <Project Path="test/Chaos.EntityFrameworkCore.Tests/Chaos.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/Chaos.TestBase/Chaos.TestBase.csproj" />
+        <Project Path="test/Chaos.Domain.Tests/Chaos.Domain.Tests.csproj" />
+        <Project Path="test/Chaos.HttpApi.Client.ConsoleTestApp/Chaos.HttpApi.Client.ConsoleTestApp.csproj" />
+    </Folder>
+</Solution>

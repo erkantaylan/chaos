@@ -1,0 +1,22 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.DotSettings.user
+
+# Angular
+angular/node_modules/
+angular/.angular/
+angular/dist/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Gas Town
+.runtime/
+.claude/
+.beads/
+.logs/
