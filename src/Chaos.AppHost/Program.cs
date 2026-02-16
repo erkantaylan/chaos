@@ -18,17 +18,23 @@ var dbMigrator = builder.AddProject<Projects.Chaos_DbMigrator>("dbmigrator")
 var abpLibs = builder.AddExecutable("abp-install-libs", "abp", "../Chaos.HttpApi.Host", "install-libs")
     .ExcludeFromManifest();
 
-// 5. Run the API Host, but only after migrations and ABP libs are done
+// 5. Angular frontend - define first so API can reference it for CORS
+var angular = builder.AddJavaScriptApp("angular", "../../angular", runScriptName: "start")
+    .WithHttpEndpoint(port: 4200, env: "PORT");
+
+// 6. Run the API Host with dynamic Angular URL for CORS
 var api = builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
     .WithExternalHttpEndpoints()
     .WithReference(database)
     .WaitForCompletion(dbMigrator)
-    .WaitForCompletion(abpLibs);
+    .WaitForCompletion(abpLibs)
+    .WithEnvironment("App__AngularUrl", angular.GetEndpoint("http"))
+    .WithEnvironment("App__CorsOrigins", angular.GetEndpoint("http"));
 
-// 6. Run the Angular frontend, but only after the API is ready
-builder.AddJavaScriptApp("angular", "../../angular", runScriptName: "start")
+// 7. Angular waits for API and gets API URL
+angular
     .WithReference(api)
     .WaitFor(api)
-    .WithHttpEndpoint(env: "PORT");
+    .WithEnvironment("API_URL", api.GetEndpoint("https"));
 
 builder.Build().Run();
