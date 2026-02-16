@@ -1,26 +1,41 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// 1. Spin up a PostgreSQL container via Docker
 var postgres = builder.AddPostgres("postgres")
     .WithPgAdmin()
     .WithDataVolume("chaos-postgres-data")
     .PublishAsContainer();
 
-// 2. Create a database named "Default" inside that PostgreSQL instance
 var database = postgres.AddDatabase("Default");
 
-// 3. Run the DbMigrator, but only after PostgreSQL is ready
+// Install ABP client-side libs (login/account MVC pages need them)
+var installLibs = builder.AddExecutable("install-libs", "abp", "../Chaos.HttpApi.Host", "install-libs")
+    .ExcludeFromManifest();
+
+var angular = builder.AddJavaScriptApp("angular", "../../angular", "start")
+    .WithNpm()
+    .WithHttpEndpoint(env: "PORT");
+
+var angularUrl = angular.GetEndpoint("http");
+
+// DbMigrator registers OpenIddict clients — needs the Angular URL for redirect URIs
 var dbMigrator = builder.AddProject<Projects.Chaos_DbMigrator>("dbmigrator")
     .WithReference(database)
-    .WaitFor(database);
+    .WaitFor(database)
+    .WithEnvironment("OpenIddict__Applications__Chaos_App__RootUrl", angularUrl);
 
-// 4. Run the API Host, but only after migrations are done
-builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
+// API host needs Angular URL for CORS and redirect allowlist
+var apiHost = builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
     .WithExternalHttpEndpoints()
     .WithReference(database)
-    .WaitForCompletion(dbMigrator);
+    .WaitForCompletion(dbMigrator)
+    .WaitForCompletion(installLibs)
+    .WithEnvironment("App__AngularUrl", angularUrl)
+    .WithEnvironment("App__CorsOrigins", angularUrl)
+    .WithEnvironment("App__RedirectAllowedUrls", angularUrl);
 
-// Note: Angular app runs separately via 'npm start' from the angular/ directory
-// For production, use docker-compose.yml which runs Angular in its own container
+// Angular needs the API host URL for OAuth and API calls
+angular
+    .WithReference(apiHost)
+    .WaitFor(apiHost);
 
 builder.Build().Run();
