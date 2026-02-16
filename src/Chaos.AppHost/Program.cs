@@ -13,10 +13,9 @@ var dbMigrator = builder.AddProject<Projects.Chaos_DbMigrator>("dbmigrator")
     .WithReference(database)
     .WaitFor(database);
 
-// 3. Run API Host after migrations complete (fixed ports for Angular compatibility)
+// 3. Run API Host after migrations complete (fixed port for Angular compatibility)
 builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
-    .WithHttpEndpoint(port: 44341, name: "http")
-    .WithHttpsEndpoint(port: 44342, name: "https")
+    .WithHttpEndpoint(port: 44341)
     .WithReference(database)
     .WaitForCompletion(dbMigrator);
 
