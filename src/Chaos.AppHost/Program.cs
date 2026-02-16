@@ -14,13 +14,21 @@ var dbMigrator = builder.AddProject<Projects.Chaos_DbMigrator>("dbmigrator")
     .WithReference(database)
     .WaitFor(database);
 
-// 4. Run the API Host, but only after migrations are done
-builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
+// 4. Install ABP client-side libraries for the API Host
+var abpLibs = builder.AddExecutable("abp-install-libs", "abp", "../Chaos.HttpApi.Host", "install-libs")
+    .ExcludeFromManifest();
+
+// 5. Run the API Host, but only after migrations and ABP libs are done
+var api = builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
     .WithExternalHttpEndpoints()
     .WithReference(database)
-    .WaitForCompletion(dbMigrator);
+    .WaitForCompletion(dbMigrator)
+    .WaitForCompletion(abpLibs);
 
-// Note: Angular app runs separately via 'npm start' from the angular/ directory
-// It will connect to the API at the URL shown in the Aspire Dashboard
+// 6. Run the Angular frontend, but only after the API is ready
+builder.AddJavaScriptApp("angular", "../../angular", runScriptName: "start")
+    .WithReference(api)
+    .WaitFor(api)
+    .WithHttpEndpoint(env: "PORT");
 
 builder.Build().Run();
