@@ -1,0 +1,131 @@
+<div class="card">
+  <div class="card-header">
+    <div class="row">
+      <div class="col col-md-6">
+        <h5 class="card-title">{{ '::Todos' | abpLocalization }}</h5>
+      </div>
+      <div class="col col-md-6 text-end">
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <i class="fa fa-plus me-1"></i>
+          {{ '::NewTodo' | abpLocalization }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    @if (loading) {
+      <div class="text-center py-4">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+      </div>
+    } @else if (todos.length === 0) {
+      <div class="text-center text-muted py-4">
+        {{ '::NoTodosFound' | abpLocalization }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>{{ '::Status' | abpLocalization }}</th>
+              <th>{{ '::Title' | abpLocalization }}</th>
+              <th>{{ '::Description' | abpLocalization }}</th>
+              <th>{{ '::CreatedBy' | abpLocalization }}</th>
+              <th>{{ '::Actions' | abpLocalization }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (todo of todos; track todo.id) {
+              <tr [class.table-success]="todo.isCompleted">
+                <td>
+                  @if (todo.isCompleted) {
+                    <span class="badge bg-success">
+                      <i class="fa fa-check"></i> {{ '::Completed' | abpLocalization }}
+                    </span>
+                  } @else {
+                    <span class="badge bg-warning text-dark">
+                      {{ '::Pending' | abpLocalization }}
+                    </span>
+                  }
+                </td>
+                <td>{{ todo.title }}</td>
+                <td>{{ todo.description || '-' }}</td>
+                <td>{{ todo.creatorUserName || '-' }}</td>
+                <td>
+                  @if (!todo.isCompleted) {
+                    <button
+                      class="btn btn-sm btn-success"
+                      (click)="completeTodo(todo)"
+                      [disabled]="completing[todo.id]">
+                      @if (completing[todo.id]) {
+                        <i class="fa fa-spinner fa-spin"></i>
+                      } @else {
+                        <i class="fa fa-check"></i>
+                      }
+                      {{ '::Complete' | abpLocalization }}
+                    </button>
+                  } @else {
+                    <small class="text-muted">
+                      {{ '::CompletedBy' | abpLocalization }}: {{ todo.completedByUserName }}
+                    </small>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Create Todo Modal -->
+@if (isCreateModalOpen) {
+  <div class="modal show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ '::NewTodo' | abpLocalization }}</h5>
+          <button type="button" class="btn-close" (click)="closeCreateModal()"></button>
+        </div>
+        <form (ngSubmit)="createTodo()">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">{{ '::Title' | abpLocalization }} *</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newTodo.title"
+                name="title"
+                required
+                maxlength="256"
+                #titleInput="ngModel">
+              @if (titleInput.invalid && titleInput.touched) {
+                <div class="text-danger small">{{ '::TitleRequired' | abpLocalization }}</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ '::Description' | abpLocalization }}</label>
+              <textarea
+                class="form-control"
+                [(ngModel)]="newTodo.description"
+                name="description"
+                rows="3"
+                maxlength="1024"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeCreateModal()">
+              {{ 'AbpUi::Cancel' | abpLocalization }}
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="creating || !newTodo.title">
+              @if (creating) {
+                <i class="fa fa-spinner fa-spin me-1"></i>
+              }
+              {{ 'AbpUi::Save' | abpLocalization }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

@@ -8,6 +8,14 @@ export const APP_ROUTES: Routes = [
     loadComponent: () => import('./home/home.component').then(c => c.HomeComponent),
   },
   {
+    path: 'todos',
+    loadComponent: () => import('./todo/todo.component').then(c => c.TodoComponent),
+    canActivate: [authGuard, permissionGuard],
+    data: {
+      requiredPolicy: 'Chaos.Todos'
+    }
+  },
+  {
     path: 'account',
     loadChildren: () => import('@abp/ng.account').then(c => c.createRoutes()),
   },
