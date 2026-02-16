@@ -32,9 +32,14 @@ namespace Chaos.EntityFrameworkCore;
     )]
 public class ChaosEntityFrameworkCoreModule : AbpModule
 {
+    static ChaosEntityFrameworkCoreModule()
+    {
+        // Enable legacy timestamp behavior for PostgreSQL (converts local DateTime to UTC)
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-
         ChaosEfCoreEntityExtensionMappings.Configure();
     }
 
