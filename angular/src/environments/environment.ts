@@ -1,14 +1,15 @@
 import { Environment } from '@abp/ng.core';
 
 const baseUrl = 'http://localhost:4200';
+const apiUrl = 'http://localhost:44341';
 
 const oAuthConfig = {
-  issuer: 'https://localhost:44342/',
+  issuer: apiUrl + '/',
   redirectUri: baseUrl,
   clientId: 'Chaos_App',
   responseType: 'code',
   scope: 'offline_access Chaos',
-  requireHttps: true,
+  requireHttps: false,
 };
 
 export const environment = {
@@ -20,7 +21,7 @@ export const environment = {
   oAuthConfig,
   apis: {
     default: {
-      url: 'https://localhost:44342',
+      url: apiUrl,
       rootNamespace: 'Chaos',
     },
     AbpAccountPublic: {

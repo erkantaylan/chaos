@@ -1,5 +1,6 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+// 1. PostgreSQL database
 var postgres = builder.AddPostgres("postgres")
     .WithPgAdmin()
     .WithDataVolume("chaos-postgres-data")
@@ -7,35 +8,19 @@ var postgres = builder.AddPostgres("postgres")
 
 var database = postgres.AddDatabase("Default");
 
-// Install ABP client-side libs (login/account MVC pages need them)
-var installLibs = builder.AddExecutable("install-libs", "abp", "../Chaos.HttpApi.Host", "install-libs")
-    .ExcludeFromManifest();
-
-var angular = builder.AddJavaScriptApp("angular", "../../angular", "start")
-    .WithNpm()
-    .WithHttpEndpoint(env: "PORT");
-
-var angularUrl = angular.GetEndpoint("http");
-
-// DbMigrator registers OpenIddict clients — needs the Angular URL for redirect URIs
+// 2. Run DbMigrator after PostgreSQL is ready
 var dbMigrator = builder.AddProject<Projects.Chaos_DbMigrator>("dbmigrator")
     .WithReference(database)
-    .WaitFor(database)
-    .WithEnvironment("OpenIddict__Applications__Chaos_App__RootUrl", angularUrl);
+    .WaitFor(database);
 
-// API host needs Angular URL for CORS and redirect allowlist
-var apiHost = builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
-    .WithExternalHttpEndpoints()
+// 3. Run API Host after migrations complete (fixed ports for Angular compatibility)
+builder.AddProject<Projects.Chaos_HttpApi_Host>("api")
+    .WithHttpEndpoint(port: 44341, name: "http")
+    .WithHttpsEndpoint(port: 44342, name: "https")
     .WithReference(database)
-    .WaitForCompletion(dbMigrator)
-    .WaitForCompletion(installLibs)
-    .WithEnvironment("App__AngularUrl", angularUrl)
-    .WithEnvironment("App__CorsOrigins", angularUrl)
-    .WithEnvironment("App__RedirectAllowedUrls", angularUrl);
+    .WaitForCompletion(dbMigrator);
 
-// Angular needs the API host URL for OAuth and API calls
-angular
-    .WithReference(apiHost)
-    .WaitFor(apiHost);
+// Note: Angular runs separately via 'npm start' from the angular/ directory
+// API: https://localhost:44342 | Angular: http://localhost:4200
 
 builder.Build().Run();
