@@ -45,18 +45,19 @@ public class TodoUsersRolesSeedContributor : IDataSeedContributor, ITransientDep
 
     public async Task SeedAsync(DataSeedContext context)
     {
-        await SeedRolesAsync();
+        await SeedRolesAsync(context);
         await SeedUsersAsync();
     }
 
-    private async Task SeedRolesAsync()
+    private async Task SeedRolesAsync(DataSeedContext context)
     {
         // TodoViewer - read only (Default permission only)
         await CreateRoleIfNotExistsAsync(TodoViewerRole);
         await _permissionDataSeeder.SeedAsync(
             "R",
             TodoViewerRole,
-            [TodoPermissions.Todos.Default]
+            [TodoPermissions.Todos.Default],
+            context.TenantId
         );
 
         // TodoEditor - CRUD permissions (Default + Create + Edit)
@@ -68,7 +69,8 @@ public class TodoUsersRolesSeedContributor : IDataSeedContributor, ITransientDep
                 TodoPermissions.Todos.Default,
                 TodoPermissions.Todos.Create,
                 TodoPermissions.Todos.Edit
-            ]
+            ],
+            context.TenantId
         );
 
         // TodoAdmin - full access (all permissions)
@@ -81,7 +83,8 @@ public class TodoUsersRolesSeedContributor : IDataSeedContributor, ITransientDep
                 TodoPermissions.Todos.Create,
                 TodoPermissions.Todos.Edit,
                 TodoPermissions.Todos.Delete
-            ]
+            ],
+            context.TenantId
         );
     }
 
