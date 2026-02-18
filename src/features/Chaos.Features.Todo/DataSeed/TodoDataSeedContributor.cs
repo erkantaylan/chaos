@@ -23,11 +23,11 @@ public class TodoDataSeedContributor : IDataSeedContributor, ITransientDependenc
 
     public async Task SeedAsync(DataSeedContext context)
     {
-        await SeedPermissionsAsync();
+        await SeedPermissionsAsync(context);
         await SeedTodosAsync();
     }
 
-    private async Task SeedPermissionsAsync()
+    private async Task SeedPermissionsAsync(DataSeedContext context)
     {
         await _permissionDataSeeder.SeedAsync(
             "R",
@@ -37,7 +37,8 @@ public class TodoDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 TodoPermissions.Todos.Create,
                 TodoPermissions.Todos.Edit,
                 TodoPermissions.Todos.Delete
-            ]
+            ],
+            context.TenantId
         );
     }
 
