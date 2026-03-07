@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "aspire": {
+      "command": "aspire",
+      "args": [
+        "mcp",
+        "start"
+      ]
+    },
+    "rider": {
+      "env": {
+        "IJ_MCP_SERVER_PORT": "64342"
+      },
+      "command": "C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\jbr\\bin\\java",
+      "args": [
+        "-classpath",
+        "C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\plugins\\mcpserver\\lib\\mcpserver-frontend.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\util-8.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.kotlinx.coroutines.core.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.ktor.client.cio.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.ktor.client.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.ktor.network.tls.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.ktor.io.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.ktor.utils.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.kotlinx.io.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.kotlinx.serialization.core.jar;C:\\Users\\octupus\\AppData\\Local\\Programs\\Rider 2\\lib\\intellij.libraries.kotlinx.serialization.json.jar",
+        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
+      ]
+    }
+  }
+}
