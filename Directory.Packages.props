@@ -1,0 +1,140 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup Label="Aspire">
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.3.0-preview.1.26156.8" />
+    <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.3.0-preview.1.26156.8" />
+  </ItemGroup>
+
+  <ItemGroup Label="Microsoft">
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.2" />
+    <PackageVersion Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="ABP">
+    <PackageVersion Include="Volo.Abp.Account.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Account.Application.Contracts" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Account.HttpApi" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Account.HttpApi.Client" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Account.Web.OpenIddict" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Components.Server.BasicTheme" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Components.Web" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Components.Web.Theming" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.Serilog" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AspNetCore.SignalR" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AuditLogging.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AuditLogging.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.AuditLogging.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Autofac" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Authorization" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.BackgroundJobs.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.BackgroundJobs.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.BlobStoring.Database.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.BlobStoring.Database.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.BlobStoring.Database.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Caching" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Ddd.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Emailing" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Blazor.Server" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.HttpApi" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.FeatureManagement.HttpApi.Client" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.GlobalFeatures" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.Application.Contracts" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.Blazor.Server" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.HttpApi" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Identity.HttpApi.Client" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Mapperly" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.OpenIddict.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.OpenIddict.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.OpenIddict.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Application.Contracts" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Application.Contracts" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Blazor.Server" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.HttpApi" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.SettingManagement.HttpApi.Client" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.Studio.Client.AspNetCore" Version="2.1.9" />
+    <PackageVersion Include="Volo.Abp.Swashbuckle" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Application" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Application.Contracts" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Blazor.Server" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Domain" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.Domain.Shared" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi.Client" Version="10.0.2" />
+    <PackageVersion Include="Volo.Abp.UI.Navigation" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="Blazorise">
+    <PackageVersion Include="Blazorise.Bootstrap5" Version="1.8.8" />
+    <PackageVersion Include="Blazorise.Icons.FontAwesome" Version="1.8.8" />
+  </ItemGroup>
+
+  <ItemGroup Label="Auth">
+    <PackageVersion Include="AspNet.Security.OAuth.GitHub" Version="10.0.0" />
+    <PackageVersion Include="IdentityModel" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Logging">
+    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.2" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="OpenTelemetry">
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.15.0-beta.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="HealthChecks">
+    <PackageVersion Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+    <PackageVersion Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Other">
+    <PackageVersion Include="KubernetesClient" Version="18.0.5" />
+  </ItemGroup>
+
+</Project>

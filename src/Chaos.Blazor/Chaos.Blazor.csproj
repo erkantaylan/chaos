@@ -14,19 +14,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="10.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0" />
-    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.2" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.2" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
-    <PackageReference Include="KubernetesClient" Version="18.0.5" />
-    <PackageReference Include="IdentityModel" Version="7.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Async" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
+    <PackageReference Include="Blazorise.Bootstrap5" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI" />
+    <PackageReference Include="KubernetesClient" />
+    <PackageReference Include="IdentityModel" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,23 +39,23 @@
     <ProjectReference Include="..\features\Chaos.Features.Todo\Chaos.Features.Todo.csproj" />
     <ProjectReference Include="..\features\Chaos.Features.Chat\Chaos.Features.Chat.csproj" />
     <ProjectReference Include="..\features\Chaos.Features.Shopping\Chaos.Features.Shopping.csproj" />
-    <PackageReference Include="Volo.Abp.Autofac" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.Swashbuckle" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.AspNetCore.Serilog" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Blazor.Server" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Blazor.Server" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.Account.Web.OpenIddict" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.Identity.Blazor.Server" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Blazor.Server" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.Autofac" />
+    <PackageReference Include="Volo.Abp.Swashbuckle" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Serilog" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Blazor.Server" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Blazor.Server" />
+    <PackageReference Include="Volo.Abp.Account.Web.OpenIddict" />
+    <PackageReference Include="Volo.Abp.Identity.Blazor.Server" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Blazor.Server" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.AspNetCore.Components.Server.BasicTheme" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc.UI.Theme.Basic" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Components.Server.BasicTheme" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Studio.Client.AspNetCore" Version="2.1.9" />
+    <PackageReference Include="Volo.Abp.Studio.Client.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('./openiddict.pfx')">

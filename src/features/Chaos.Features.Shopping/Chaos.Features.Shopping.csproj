@@ -14,16 +14,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Ddd.Application" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.AspNetCore.Components.Web" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.AspNetCore.Components.Web.Theming" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.UI.Navigation" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.Authorization" Version="10.0.2" />
-    <PackageReference Include="Volo.Abp.Mapperly" Version="10.0.2" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.13.2" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.13.2" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.Ddd.Application" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Components.Web" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Components.Web.Theming" />
+    <PackageReference Include="Volo.Abp.UI.Navigation" />
+    <PackageReference Include="Volo.Abp.Authorization" />
+    <PackageReference Include="Volo.Abp.Mapperly" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" />
   </ItemGroup>
 
   <ItemGroup>
