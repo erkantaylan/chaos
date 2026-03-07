@@ -41,10 +41,6 @@ using Volo.Abp.Identity;
 using Volo.Abp.Autofac;
 using Volo.Abp.Mapperly;
 using Chaos.Blazor.HealthChecks;
-using Volo.Abp.Identity.Blazor.Server;
-using Volo.Abp.TenantManagement.Blazor.Server;
-using Volo.Abp.SettingManagement.Blazor.Server;
-using Volo.Abp.FeatureManagement.Blazor.Server;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
@@ -53,9 +49,6 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
-using Blazorise;
-using Blazorise.Bootstrap5;
-using Blazorise.Icons.FontAwesome;
 using Volo.Abp.Studio.Client.AspNetCore;
 
 namespace Chaos.Blazor;
@@ -70,14 +63,10 @@ namespace Chaos.Blazor;
     typeof(ShoppingFeatureModule),
     typeof(AbpAutofacModule),
     typeof(AbpSwashbuckleModule),
-    typeof(AbpIdentityBlazorServerModule),
-    typeof(AbpTenantManagementBlazorServerModule),
     typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreComponentsServerBasicThemeModule),
     typeof(AbpAspNetCoreMvcUiBasicThemeModule),
-    typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpFeatureManagementBlazorServerModule),
-    typeof(AbpSettingManagementBlazorServerModule)
+    typeof(AbpAspNetCoreSerilogModule)
    )]
 public class ChaosBlazorModule : AbpModule
 {
@@ -159,11 +148,6 @@ public class ChaosBlazorModule : AbpModule
 
         // Register FluentUI services
         context.Services.AddFluentUIComponents();
-
-        // Register Blazorise services (required by ABP identity/tenant management UI)
-        context.Services.AddBlazorise()
-            .AddBootstrap5Providers()
-            .AddFontAwesomeIcons();
 
         ConfigureStudio(hostingEnvironment);
         ConfigureAuthentication(context);

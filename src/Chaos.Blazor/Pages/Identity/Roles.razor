@@ -1,0 +1,381 @@
+@page "/identity/roles"
+@attribute [Authorize]
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using Chaos.Localization
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Application.Dtos
+@using Volo.Abp.Identity
+@using Volo.Abp.PermissionManagement
+@inject IIdentityRoleAppService RoleAppService
+@inject IPermissionAppService PermissionAppService
+@inject IDialogService DialogService
+@inject IToastService ToastService
+@inject IStringLocalizer<ChaosResource> L
+
+<FluentCard>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <FluentLabel Typo="Typography.H5">Roles</FluentLabel>
+        <FluentButton Appearance="Appearance.Accent" OnClick="OpenCreateDialog"
+                      IconStart="@(new Icons.Regular.Size20.Add())">New Role</FluentButton>
+    </div>
+
+    @if (_loading)
+    {
+        <FluentProgress />
+    }
+    else if (_roles.Count == 0)
+    {
+        <FluentLabel>No roles found.</FluentLabel>
+    }
+    else
+    {
+        <FluentDataGrid Items="@_roles.AsQueryable()" TGridItem="IdentityRoleDto" Style="width: 100%;">
+            <PropertyColumn Property="@(r => r.Name)" Title="Name" />
+            <TemplateColumn Title="Default">
+                <FluentBadge Appearance="@(context.IsDefault ? Appearance.Accent : Appearance.Neutral)">
+                    @(context.IsDefault ? "Yes" : "No")
+                </FluentBadge>
+            </TemplateColumn>
+            <TemplateColumn Title="Public">
+                <FluentBadge Appearance="@(context.IsPublic ? Appearance.Accent : Appearance.Neutral)">
+                    @(context.IsPublic ? "Yes" : "No")
+                </FluentBadge>
+            </TemplateColumn>
+            <TemplateColumn Title="Actions">
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => OpenEditDialog(context))"
+                              IconStart="@(new Icons.Regular.Size16.Edit())" Title="Edit" />
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => OpenPermissionsDialog(context))"
+                              IconStart="@(new Icons.Regular.Size16.Shield())" Title="Permissions" />
+                @if (!context.IsStatic)
+                {
+                    <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => DeleteAsync(context))"
+                                  IconStart="@(new Icons.Regular.Size16.Delete())" Title="Delete" />
+                }
+            </TemplateColumn>
+        </FluentDataGrid>
+    }
+</FluentCard>
+
+@* Create Dialog *@
+@if (_createDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_createDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseCreateDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">New Role</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_newRole">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_newRole.Name" Label="Name" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentCheckbox @bind-Value="_newRole.IsDefault" Label="Default" />
+                    <FluentCheckbox @bind-Value="_newRole.IsPublic" Label="Public" />
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseCreateDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="CreateAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@* Edit Dialog *@
+@if (_editDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_editDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseEditDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">Edit Role</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_editRole">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_editRole.Name" Label="Name" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentCheckbox @bind-Value="_editRole.IsDefault" Label="Default" />
+                    <FluentCheckbox @bind-Value="_editRole.IsPublic" Label="Public" />
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseEditDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="UpdateAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@* Permissions Dialog *@
+@if (_permissionsDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_permissionsDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="ClosePermissionsDialog"
+                  Style="min-width: 500px; max-height: 80vh;">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">Permissions - @_permissionsRoleName</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            @if (_permissionsLoading)
+            {
+                <FluentProgress />
+            }
+            else if (_permissionGroups != null)
+            {
+                <FluentStack Orientation="Orientation.Vertical" Style="gap: 16px;">
+                    @foreach (var group in _permissionGroups)
+                    {
+                        <FluentCard Style="padding: 12px;">
+                            <FluentLabel Typo="Typography.H6" Style="margin-bottom: 8px;">@group.DisplayName</FluentLabel>
+                            <FluentStack Orientation="Orientation.Vertical" Style="gap: 4px; padding-left: 8px;">
+                                @foreach (var permission in group.Permissions)
+                                {
+                                    var perm = permission;
+                                    var indent = string.IsNullOrEmpty(perm.ParentName) ? "0px" : "24px";
+                                    <div style="margin-left: @indent;">
+                                        <FluentCheckbox Value="@_permissionGrants[perm.Name]"
+                                                        ValueChanged="@((bool val) => OnPermissionChanged(perm.Name, val))"
+                                                        Label="@perm.DisplayName" />
+                                    </div>
+                                }
+                            </FluentStack>
+                        </FluentCard>
+                    }
+                </FluentStack>
+            }
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="ClosePermissionsDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="SavePermissionsAsync" Disabled="@_permissionsLoading">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@code {
+    private List<IdentityRoleDto> _roles = new();
+    private bool _loading = true;
+
+    // Create dialog
+    private bool _createDialogVisible;
+    private bool _createDialogHidden = true;
+    private IdentityRoleCreateDto _newRole = new();
+
+    // Edit dialog
+    private bool _editDialogVisible;
+    private bool _editDialogHidden = true;
+    private IdentityRoleUpdateDto _editRole = new();
+    private Guid _editingRoleId;
+
+    // Permissions dialog
+    private bool _permissionsDialogVisible;
+    private bool _permissionsDialogHidden = true;
+    private bool _permissionsLoading;
+    private string _permissionsRoleName = string.Empty;
+    private List<PermissionGroupDto>? _permissionGroups;
+    private Dictionary<string, bool> _permissionGrants = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRolesAsync();
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        _loading = true;
+        try
+        {
+            var result = await RoleAppService.GetListAsync(new GetIdentityRolesInput
+            {
+                MaxResultCount = 100,
+                SkipCount = 0
+            });
+            _roles = result.Items.ToList();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    // Create
+    private void OpenCreateDialog()
+    {
+        _newRole = new IdentityRoleCreateDto();
+        _createDialogVisible = true;
+        _createDialogHidden = false;
+    }
+
+    private void CloseCreateDialog()
+    {
+        _createDialogVisible = false;
+        _createDialogHidden = true;
+    }
+
+    private async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newRole.Name))
+            return;
+
+        await RoleAppService.CreateAsync(_newRole);
+        CloseCreateDialog();
+        ToastService.ShowSuccess("Role created successfully.");
+        await LoadRolesAsync();
+    }
+
+    // Edit
+    private void OpenEditDialog(IdentityRoleDto role)
+    {
+        _editingRoleId = role.Id;
+        _editRole = new IdentityRoleUpdateDto
+        {
+            Name = role.Name,
+            IsDefault = role.IsDefault,
+            IsPublic = role.IsPublic,
+            ConcurrencyStamp = role.ConcurrencyStamp
+        };
+        _editDialogVisible = true;
+        _editDialogHidden = false;
+    }
+
+    private void CloseEditDialog()
+    {
+        _editDialogVisible = false;
+        _editDialogHidden = true;
+    }
+
+    private async Task UpdateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_editRole.Name))
+            return;
+
+        await RoleAppService.UpdateAsync(_editingRoleId, _editRole);
+        CloseEditDialog();
+        ToastService.ShowSuccess("Role updated successfully.");
+        await LoadRolesAsync();
+    }
+
+    // Delete
+    private async Task DeleteAsync(IdentityRoleDto role)
+    {
+        var dialog = await DialogService.ShowConfirmationAsync(
+            $"Are you sure you want to delete the role '{role.Name}'?",
+            "Delete",
+            "Cancel");
+
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await RoleAppService.DeleteAsync(role.Id);
+            ToastService.ShowInfo("Role deleted successfully.");
+            await LoadRolesAsync();
+        }
+    }
+
+    // Permissions
+    private async Task OpenPermissionsDialog(IdentityRoleDto role)
+    {
+        _permissionsRoleName = role.Name;
+        _permissionsLoading = true;
+        _permissionGroups = null;
+        _permissionGrants = new();
+        _permissionsDialogVisible = true;
+        _permissionsDialogHidden = false;
+
+        try
+        {
+            var permissionResult = await PermissionAppService.GetAsync("R", role.Name);
+            _permissionGroups = permissionResult.Groups.ToList();
+
+            foreach (var group in _permissionGroups)
+            {
+                foreach (var permission in group.Permissions)
+                {
+                    _permissionGrants[permission.Name] = permission.IsGranted;
+                }
+            }
+        }
+        finally
+        {
+            _permissionsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ClosePermissionsDialog()
+    {
+        _permissionsDialogVisible = false;
+        _permissionsDialogHidden = true;
+    }
+
+    private void OnPermissionChanged(string permissionName, bool isGranted)
+    {
+        _permissionGrants[permissionName] = isGranted;
+
+        if (_permissionGroups == null) return;
+
+        if (isGranted)
+        {
+            // Grant parent permissions when a child is granted
+            GrantParentPermissions(permissionName);
+        }
+        else
+        {
+            // Revoke child permissions when a parent is revoked
+            RevokeChildPermissions(permissionName);
+        }
+    }
+
+    private void GrantParentPermissions(string permissionName)
+    {
+        if (_permissionGroups == null) return;
+
+        foreach (var group in _permissionGroups)
+        {
+            var permission = group.Permissions.FirstOrDefault(p => p.Name == permissionName);
+            if (permission != null && !string.IsNullOrEmpty(permission.ParentName))
+            {
+                _permissionGrants[permission.ParentName] = true;
+                GrantParentPermissions(permission.ParentName);
+                break;
+            }
+        }
+    }
+
+    private void RevokeChildPermissions(string permissionName)
+    {
+        if (_permissionGroups == null) return;
+
+        foreach (var group in _permissionGroups)
+        {
+            foreach (var permission in group.Permissions)
+            {
+                if (permission.ParentName == permissionName)
+                {
+                    _permissionGrants[permission.Name] = false;
+                    RevokeChildPermissions(permission.Name);
+                }
+            }
+        }
+    }
+
+    private async Task SavePermissionsAsync()
+    {
+        var updateDto = new UpdatePermissionsDto
+        {
+            Permissions = _permissionGrants
+                .Select(kvp => new UpdatePermissionDto
+                {
+                    Name = kvp.Key,
+                    IsGranted = kvp.Value
+                })
+                .ToArray()
+        };
+
+        await PermissionAppService.UpdateAsync("R", _permissionsRoleName, updateDto);
+        ClosePermissionsDialog();
+        ToastService.ShowSuccess("Permissions updated successfully.");
+    }
+}

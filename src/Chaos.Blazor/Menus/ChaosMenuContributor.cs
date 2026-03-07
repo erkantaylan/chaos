@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using Chaos.Localization;
 using Chaos.MultiTenancy;
+using Volo.Abp.Authorization.Permissions;
+using Volo.Abp.Identity;
+using Volo.Abp.TenantManagement;
 using Volo.Abp.UI.Navigation;
-using Volo.Abp.SettingManagement.Blazor.Menus;
-using Volo.Abp.TenantManagement.Blazor.Navigation;
-using Volo.Abp.Identity.Blazor;
 
 namespace Chaos.Blazor.Menus;
 
@@ -49,15 +49,43 @@ public class ChaosMenuContributor : IMenuContributor
 
         if (MultiTenancyConsts.IsEnabled)
         {
-            administration.SetSubItemOrder(TenantManagementMenuNames.GroupName, 1);
-        }
-        else
-        {
-            administration.TryRemoveMenuItem(TenantManagementMenuNames.GroupName);
+            administration.AddItem(
+                new ApplicationMenuItem(
+                    ChaosMenus.TenantManagement,
+                    "Tenants",
+                    "/tenant-management/tenants",
+                    icon: "fas fa-building",
+                    order: 1
+                ).RequirePermissions(TenantManagementPermissions.Tenants.Default)
+            );
         }
 
-        administration.SetSubItemOrder(IdentityMenuNames.GroupName, 2);
-        administration.SetSubItemOrder(SettingManagementMenus.GroupName, 3);
+        var identityMenu = new ApplicationMenuItem(
+            ChaosMenus.Identity,
+            "Identity",
+            icon: "fas fa-id-card",
+            order: 2
+        );
+
+        identityMenu.AddItem(
+            new ApplicationMenuItem(
+                ChaosMenus.IdentityUsers,
+                "Users",
+                "/identity/users",
+                icon: "fas fa-users"
+            ).RequirePermissions(IdentityPermissions.Users.Default)
+        );
+
+        identityMenu.AddItem(
+            new ApplicationMenuItem(
+                ChaosMenus.IdentityRoles,
+                "Roles",
+                "/identity/roles",
+                icon: "fas fa-user-shield"
+            ).RequirePermissions(IdentityPermissions.Roles.Default)
+        );
+
+        administration.AddItem(identityMenu);
 
         return Task.CompletedTask;
     }

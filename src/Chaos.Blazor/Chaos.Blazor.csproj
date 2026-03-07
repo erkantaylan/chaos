@@ -21,8 +21,6 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" />
-    <PackageReference Include="Blazorise.Bootstrap5" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" />
     <PackageReference Include="AspNetCore.HealthChecks.UI" />
     <PackageReference Include="KubernetesClient" />
     <PackageReference Include="IdentityModel" />
@@ -42,11 +40,7 @@
     <PackageReference Include="Volo.Abp.Autofac" />
     <PackageReference Include="Volo.Abp.Swashbuckle" />
     <PackageReference Include="Volo.Abp.AspNetCore.Serilog" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Blazor.Server" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Blazor.Server" />
     <PackageReference Include="Volo.Abp.Account.Web.OpenIddict" />
-    <PackageReference Include="Volo.Abp.Identity.Blazor.Server" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Blazor.Server" />
   </ItemGroup>
 
   <ItemGroup>

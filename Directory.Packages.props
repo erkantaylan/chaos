@@ -52,7 +52,6 @@
     <PackageVersion Include="Volo.Abp.EntityFrameworkCore.PostgreSql" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.FeatureManagement.Application" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.FeatureManagement.Application.Contracts" Version="10.0.2" />
-    <PackageVersion Include="Volo.Abp.FeatureManagement.Blazor.Server" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.FeatureManagement.Domain" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.FeatureManagement.Domain.Shared" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.FeatureManagement.EntityFrameworkCore" Version="10.0.2" />
@@ -61,7 +60,6 @@
     <PackageVersion Include="Volo.Abp.GlobalFeatures" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.Identity.Application" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.Identity.Application.Contracts" Version="10.0.2" />
-    <PackageVersion Include="Volo.Abp.Identity.Blazor.Server" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.Identity.Domain" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.Identity.Domain.Shared" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.Identity.EntityFrameworkCore" Version="10.0.2" />
@@ -81,7 +79,6 @@
     <PackageVersion Include="Volo.Abp.PermissionManagement.HttpApi.Client" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.SettingManagement.Application" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.SettingManagement.Application.Contracts" Version="10.0.2" />
-    <PackageVersion Include="Volo.Abp.SettingManagement.Blazor.Server" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.SettingManagement.Domain" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.SettingManagement.Domain.Shared" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.SettingManagement.EntityFrameworkCore" Version="10.0.2" />
@@ -91,18 +88,12 @@
     <PackageVersion Include="Volo.Abp.Swashbuckle" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.Application" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.Application.Contracts" Version="10.0.2" />
-    <PackageVersion Include="Volo.Abp.TenantManagement.Blazor.Server" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.Domain" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.Domain.Shared" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.EntityFrameworkCore" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.TenantManagement.HttpApi.Client" Version="10.0.2" />
     <PackageVersion Include="Volo.Abp.UI.Navigation" Version="10.0.2" />
-  </ItemGroup>
-
-  <ItemGroup Label="Blazorise">
-    <PackageVersion Include="Blazorise.Bootstrap5" Version="1.8.8" />
-    <PackageVersion Include="Blazorise.Icons.FontAwesome" Version="1.8.8" />
   </ItemGroup>
 
   <ItemGroup Label="Auth">

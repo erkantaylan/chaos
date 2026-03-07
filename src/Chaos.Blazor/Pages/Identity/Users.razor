@@ -1,0 +1,346 @@
+@page "/identity/users"
+@attribute [Authorize]
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Application.Dtos
+@using Volo.Abp.Identity
+@using Chaos.Localization
+@inject IIdentityUserAppService UserAppService
+@inject IIdentityRoleAppService RoleAppService
+@inject IDialogService DialogService
+@inject IToastService ToastService
+@inject IStringLocalizer<ChaosResource> L
+
+<FluentCard>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <FluentLabel Typo="Typography.H5">Users</FluentLabel>
+        <FluentButton Appearance="Appearance.Accent" OnClick="OpenCreateDialog"
+                      IconStart="@(new Icons.Regular.Size20.Add())">New User</FluentButton>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+        <FluentTextField @bind-Value="_filter" Placeholder="Search users..." Style="width: 300px;"
+                         @oninput="OnFilterChanged"
+                         IconStart="@(new Icons.Regular.Size16.Search())" />
+    </div>
+
+    @if (_loading)
+    {
+        <FluentProgress />
+    }
+    else if (_users.Count == 0)
+    {
+        <FluentLabel>No users found.</FluentLabel>
+    }
+    else
+    {
+        <FluentDataGrid Items="@_users.AsQueryable()" TGridItem="IdentityUserDto" Style="width: 100%;">
+            <PropertyColumn Property="@(u => u.UserName)" Title="UserName" />
+            <PropertyColumn Property="@(u => u.Email)" Title="Email" />
+            <PropertyColumn Property="@(u => u.PhoneNumber)" Title="Phone Number" />
+            <TemplateColumn Title="Active">
+                <FluentBadge Appearance="@(context.IsActive ? Appearance.Accent : Appearance.Neutral)">
+                    @(context.IsActive ? "Yes" : "No")
+                </FluentBadge>
+            </TemplateColumn>
+            <TemplateColumn Title="Actions">
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => OpenEditDialog(context))"
+                              IconStart="@(new Icons.Regular.Size16.Edit())" Title="Edit" />
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => DeleteAsync(context))"
+                              IconStart="@(new Icons.Regular.Size16.Delete())" Title="Delete" />
+            </TemplateColumn>
+        </FluentDataGrid>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+            <FluentLabel>Page @(_currentPage + 1) of @TotalPages (Total: @_totalCount)</FluentLabel>
+            <FluentStack Orientation="Orientation.Horizontal">
+                <FluentButton Appearance="Appearance.Outline" Disabled="@(_currentPage == 0)"
+                              OnClick="PreviousPage"
+                              IconStart="@(new Icons.Regular.Size16.ArrowLeft())">Previous</FluentButton>
+                <FluentButton Appearance="Appearance.Outline" Disabled="@(_currentPage >= TotalPages - 1)"
+                              OnClick="NextPage"
+                              IconEnd="@(new Icons.Regular.Size16.ArrowRight())">Next</FluentButton>
+            </FluentStack>
+        </div>
+    }
+</FluentCard>
+
+@* Create Dialog *@
+@if (_createDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_createDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseCreateDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">New User</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_createInput">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_createInput.UserName" Label="UserName" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_createInput.Email" Label="Email" Required="true"
+                                     TextFieldType="TextFieldType.Email" Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_createInput.Password" Label="Password" Required="true"
+                                     TextFieldType="TextFieldType.Password" Maxlength="128" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_createInput.Name" Label="Name"
+                                     Maxlength="64" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_createInput.Surname" Label="Surname"
+                                     Maxlength="64" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_createInput.PhoneNumber" Label="Phone Number"
+                                     TextFieldType="TextFieldType.Tel" Maxlength="16" Style="width: 100%;" />
+                    <FluentCheckbox @bind-Value="_createIsActive" Label="Active" />
+
+                    <FluentLabel Typo="Typography.Body" Style="margin-top: 8px;">Roles</FluentLabel>
+                    @foreach (var role in _allRoles)
+                    {
+                        var roleName = role.Name;
+                        <FluentCheckbox Value="@(_createSelectedRoles.Contains(roleName))"
+                                        ValueChanged="@((bool v) => ToggleCreateRole(roleName, v))"
+                                        Label="@roleName" />
+                    }
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseCreateDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="CreateAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@* Edit Dialog *@
+@if (_editDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_editDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseEditDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">Edit User</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_editInput">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_editInput.UserName" Label="UserName" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editInput.Email" Label="Email" Required="true"
+                                     TextFieldType="TextFieldType.Email" Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editInput.Password" Label="Password (leave blank to keep current)"
+                                     TextFieldType="TextFieldType.Password" Maxlength="128" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editInput.Name" Label="Name"
+                                     Maxlength="64" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editInput.Surname" Label="Surname"
+                                     Maxlength="64" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editInput.PhoneNumber" Label="Phone Number"
+                                     TextFieldType="TextFieldType.Tel" Maxlength="16" Style="width: 100%;" />
+                    <FluentCheckbox @bind-Value="_editIsActive" Label="Active" />
+
+                    <FluentLabel Typo="Typography.Body" Style="margin-top: 8px;">Roles</FluentLabel>
+                    @foreach (var role in _allRoles)
+                    {
+                        var roleName = role.Name;
+                        <FluentCheckbox Value="@(_editSelectedRoles.Contains(roleName))"
+                                        ValueChanged="@((bool v) => ToggleEditRole(roleName, v))"
+                                        Label="@roleName" />
+                    }
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseEditDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="UpdateAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@code {
+    private List<IdentityUserDto> _users = new();
+    private List<IdentityRoleDto> _allRoles = new();
+    private bool _loading = true;
+    private string? _filter;
+    private int _currentPage;
+    private int _pageSize = 10;
+    private long _totalCount;
+
+    private int TotalPages => (int)Math.Max(1, Math.Ceiling((double)_totalCount / _pageSize));
+
+    // Create dialog state
+    private bool _createDialogVisible;
+    private bool _createDialogHidden = true;
+    private IdentityUserCreateDto _createInput = new();
+    private bool _createIsActive = true;
+    private HashSet<string> _createSelectedRoles = new();
+
+    // Edit dialog state
+    private bool _editDialogVisible;
+    private bool _editDialogHidden = true;
+    private IdentityUserUpdateDto _editInput = new();
+    private bool _editIsActive = true;
+    private HashSet<string> _editSelectedRoles = new();
+    private Guid _editingUserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRolesAsync();
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadRolesAsync()
+    {
+        var result = await UserAppService.GetAssignableRolesAsync();
+        _allRoles = result.Items.ToList();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        _loading = true;
+        try
+        {
+            var result = await UserAppService.GetListAsync(new GetIdentityUsersInput
+            {
+                Filter = _filter,
+                MaxResultCount = _pageSize,
+                SkipCount = _currentPage * _pageSize
+            });
+            _users = result.Items.ToList();
+            _totalCount = result.TotalCount;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task OnFilterChanged(ChangeEventArgs e)
+    {
+        _filter = e.Value?.ToString();
+        _currentPage = 0;
+        await LoadUsersAsync();
+    }
+
+    private async Task PreviousPage()
+    {
+        if (_currentPage > 0)
+        {
+            _currentPage--;
+            await LoadUsersAsync();
+        }
+    }
+
+    private async Task NextPage()
+    {
+        if (_currentPage < TotalPages - 1)
+        {
+            _currentPage++;
+            await LoadUsersAsync();
+        }
+    }
+
+    // Create dialog
+    private void OpenCreateDialog()
+    {
+        _createInput = new IdentityUserCreateDto { IsActive = true };
+        _createIsActive = true;
+        _createSelectedRoles = new HashSet<string>();
+        _createDialogVisible = true;
+        _createDialogHidden = false;
+    }
+
+    private void CloseCreateDialog()
+    {
+        _createDialogVisible = false;
+        _createDialogHidden = true;
+    }
+
+    private void ToggleCreateRole(string roleName, bool selected)
+    {
+        if (selected)
+            _createSelectedRoles.Add(roleName);
+        else
+            _createSelectedRoles.Remove(roleName);
+    }
+
+    private async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_createInput.UserName) ||
+            string.IsNullOrWhiteSpace(_createInput.Email) ||
+            string.IsNullOrWhiteSpace(_createInput.Password))
+            return;
+
+        _createInput.IsActive = _createIsActive;
+        _createInput.RoleNames = _createSelectedRoles.ToArray();
+        await UserAppService.CreateAsync(_createInput);
+        CloseCreateDialog();
+        ToastService.ShowSuccess("User created successfully.");
+        await LoadUsersAsync();
+    }
+
+    // Edit dialog
+    private async Task OpenEditDialog(IdentityUserDto user)
+    {
+        _editingUserId = user.Id;
+        _editInput = new IdentityUserUpdateDto
+        {
+            UserName = user.UserName,
+            Email = user.Email,
+            Name = user.Name,
+            Surname = user.Surname,
+            PhoneNumber = user.PhoneNumber,
+            IsActive = user.IsActive,
+            ConcurrencyStamp = user.ConcurrencyStamp
+        };
+        _editIsActive = user.IsActive;
+
+        var userRoles = await UserAppService.GetRolesAsync(user.Id);
+        _editSelectedRoles = new HashSet<string>(userRoles.Items.Select(r => r.Name));
+
+        _editDialogVisible = true;
+        _editDialogHidden = false;
+    }
+
+    private void CloseEditDialog()
+    {
+        _editDialogVisible = false;
+        _editDialogHidden = true;
+    }
+
+    private void ToggleEditRole(string roleName, bool selected)
+    {
+        if (selected)
+            _editSelectedRoles.Add(roleName);
+        else
+            _editSelectedRoles.Remove(roleName);
+    }
+
+    private async Task UpdateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_editInput.UserName) ||
+            string.IsNullOrWhiteSpace(_editInput.Email))
+            return;
+
+        _editInput.IsActive = _editIsActive;
+        _editInput.RoleNames = _editSelectedRoles.ToArray();
+        await UserAppService.UpdateAsync(_editingUserId, _editInput);
+        CloseEditDialog();
+        ToastService.ShowSuccess("User updated successfully.");
+        await LoadUsersAsync();
+    }
+
+    // Delete
+    private async Task DeleteAsync(IdentityUserDto user)
+    {
+        var dialog = await DialogService.ShowConfirmationAsync(
+            $"Are you sure you want to delete user '{user.UserName}'?",
+            "Delete",
+            "Cancel");
+
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await UserAppService.DeleteAsync(user.Id);
+            ToastService.ShowInfo("User deleted.");
+            await LoadUsersAsync();
+        }
+    }
+}

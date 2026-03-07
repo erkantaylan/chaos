@@ -1,0 +1,293 @@
+@page "/tenant-management/tenants"
+@attribute [Authorize]
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using Chaos.Localization
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Application.Dtos
+@using Volo.Abp.TenantManagement
+@inject ITenantAppService TenantAppService
+@inject IDialogService DialogService
+@inject IToastService ToastService
+@inject IStringLocalizer<ChaosResource> L
+
+<FluentCard>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <FluentLabel Typo="Typography.H5">Tenants</FluentLabel>
+        <FluentButton Appearance="Appearance.Accent" OnClick="OpenCreateDialog"
+                      IconStart="@(new Icons.Regular.Size20.Add())">New Tenant</FluentButton>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+        <FluentTextField @bind-Value="_filter" Placeholder="Search..." Style="width: 300px;"
+                         @oninput="OnFilterChanged"
+                         IconStart="@(new Icons.Regular.Size16.Search())" />
+    </div>
+
+    @if (_loading)
+    {
+        <FluentProgress />
+    }
+    else if (_tenants.Count == 0)
+    {
+        <FluentLabel>No tenants found.</FluentLabel>
+    }
+    else
+    {
+        <FluentDataGrid Items="@_tenants.AsQueryable()" TGridItem="TenantDto" Style="width: 100%;">
+            <PropertyColumn Property="@(t => t.Name)" Title="Name" />
+            <TemplateColumn Title="Actions">
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => OpenEditDialog(context))"
+                              IconStart="@(new Icons.Regular.Size16.Edit())" Title="Edit" />
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => OpenConnectionStringDialog(context))"
+                              IconStart="@(new Icons.Regular.Size16.Database())" Title="Connection Strings" />
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => DeleteAsync(context))"
+                              IconStart="@(new Icons.Regular.Size16.Delete())" Title="Delete" />
+            </TemplateColumn>
+        </FluentDataGrid>
+    }
+</FluentCard>
+
+@* Create Dialog *@
+@if (_createDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_createDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseCreateDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">New Tenant</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_newTenant">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_newTenant.Name" Label="Name" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_newTenant.AdminEmailAddress" Label="Admin Email" Required="true"
+                                     TextFieldType="TextFieldType.Email" Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_newTenant.AdminPassword" Label="Admin Password" Required="true"
+                                     TextFieldType="TextFieldType.Password" Maxlength="128" Style="width: 100%;" />
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseCreateDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="CreateAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@* Edit Dialog *@
+@if (_editDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_editDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseEditDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">Edit Tenant</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_editTenant">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_editTenant.Name" Label="Name" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseEditDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="UpdateAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@* Connection String Dialog *@
+@if (_connStringDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_connStringDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseConnectionStringDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">Manage Connection String</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <FluentStack Orientation="Orientation.Vertical">
+                <FluentCheckbox @bind-Value="_useSharedDatabase" Label="Use shared database"
+                                @onchange="OnUseSharedDatabaseChanged" />
+                @if (!_useSharedDatabase)
+                {
+                    <FluentTextField @bind-Value="_defaultConnectionString" Label="Default Connection String"
+                                     Style="width: 100%;" />
+                }
+            </FluentStack>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseConnectionStringDialog">Cancel</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="SaveConnectionStringAsync">Save</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@code {
+    private List<TenantDto> _tenants = new();
+    private bool _loading = true;
+    private string? _filter;
+
+    private bool _createDialogVisible;
+    private bool _createDialogHidden = true;
+    private TenantCreateDto _newTenant = new();
+
+    private bool _editDialogVisible;
+    private bool _editDialogHidden = true;
+    private TenantUpdateDto _editTenant = new();
+    private Guid _editingTenantId;
+
+    private bool _connStringDialogVisible;
+    private bool _connStringDialogHidden = true;
+    private Guid _connStringTenantId;
+    private string? _defaultConnectionString;
+    private bool _useSharedDatabase = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTenantsAsync();
+    }
+
+    private async Task LoadTenantsAsync()
+    {
+        _loading = true;
+        try
+        {
+            var result = await TenantAppService.GetListAsync(new GetTenantsInput
+            {
+                Filter = _filter,
+                MaxResultCount = 100,
+                SkipCount = 0
+            });
+            _tenants = result.Items.ToList();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task OnFilterChanged(ChangeEventArgs e)
+    {
+        _filter = e.Value?.ToString();
+        await LoadTenantsAsync();
+    }
+
+    // Create
+    private void OpenCreateDialog()
+    {
+        _newTenant = new TenantCreateDto();
+        _createDialogVisible = true;
+        _createDialogHidden = false;
+    }
+
+    private void CloseCreateDialog()
+    {
+        _createDialogVisible = false;
+        _createDialogHidden = true;
+    }
+
+    private async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newTenant.Name))
+            return;
+
+        await TenantAppService.CreateAsync(_newTenant);
+        CloseCreateDialog();
+        ToastService.ShowSuccess("Tenant created successfully.");
+        await LoadTenantsAsync();
+    }
+
+    // Edit
+    private void OpenEditDialog(TenantDto tenant)
+    {
+        _editingTenantId = tenant.Id;
+        _editTenant = new TenantUpdateDto
+        {
+            Name = tenant.Name,
+            ConcurrencyStamp = tenant.ConcurrencyStamp
+        };
+        _editDialogVisible = true;
+        _editDialogHidden = false;
+    }
+
+    private void CloseEditDialog()
+    {
+        _editDialogVisible = false;
+        _editDialogHidden = true;
+    }
+
+    private async Task UpdateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_editTenant.Name))
+            return;
+
+        await TenantAppService.UpdateAsync(_editingTenantId, _editTenant);
+        CloseEditDialog();
+        ToastService.ShowSuccess("Tenant updated successfully.");
+        await LoadTenantsAsync();
+    }
+
+    // Delete
+    private async Task DeleteAsync(TenantDto tenant)
+    {
+        var dialog = await DialogService.ShowConfirmationAsync(
+            $"Are you sure you want to delete the tenant '{tenant.Name}'?",
+            "Delete",
+            "Cancel");
+
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await TenantAppService.DeleteAsync(tenant.Id);
+            ToastService.ShowInfo("Tenant deleted successfully.");
+            await LoadTenantsAsync();
+        }
+    }
+
+    // Connection Strings
+    private async Task OpenConnectionStringDialog(TenantDto tenant)
+    {
+        _connStringTenantId = tenant.Id;
+        _defaultConnectionString = await TenantAppService.GetDefaultConnectionStringAsync(tenant.Id);
+        _useSharedDatabase = string.IsNullOrWhiteSpace(_defaultConnectionString);
+        _connStringDialogVisible = true;
+        _connStringDialogHidden = false;
+    }
+
+    private void CloseConnectionStringDialog()
+    {
+        _connStringDialogVisible = false;
+        _connStringDialogHidden = true;
+    }
+
+    private void OnUseSharedDatabaseChanged(ChangeEventArgs e)
+    {
+        if (_useSharedDatabase)
+        {
+            _defaultConnectionString = null;
+        }
+    }
+
+    private async Task SaveConnectionStringAsync()
+    {
+        if (_useSharedDatabase)
+        {
+            await TenantAppService.DeleteDefaultConnectionStringAsync(_connStringTenantId);
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(_defaultConnectionString))
+            {
+                await TenantAppService.UpdateDefaultConnectionStringAsync(
+                    _connStringTenantId, _defaultConnectionString);
+            }
+        }
+
+        CloseConnectionStringDialog();
+        ToastService.ShowSuccess("Connection string updated successfully.");
+    }
+}
