@@ -1,74 +1,188 @@
 # Chaos
 
-ABP-based modular application with Angular frontend and .NET 10 backend.
+A modular ABP Framework demo application showcasing FluentUI Blazor components, real-time chat with SignalR, and cloud-native orchestration with .NET Aspire.
 
-## Architecture
+## Integration Guide
 
-```
-Chaos.slnx
-├── src/
-│   ├── Chaos.Domain.Shared/          # Shared constants, enums, localization
-│   ├── Chaos.Domain/                 # Domain entities, repositories
-│   ├── Chaos.Application.Contracts/  # DTOs, application service interfaces
-│   ├── Chaos.Application/            # Application service implementations
-│   ├── Chaos.EntityFrameworkCore/    # EF Core DbContext, migrations
-│   ├── Chaos.HttpApi/               # API controllers
-│   ├── Chaos.HttpApi.Client/        # HTTP client proxies
-│   ├── Chaos.HttpApi.Host/          # API host (startup)
-│   ├── Chaos.DbMigrator/            # Database migration console app
-│   ├── Chaos.AppHost/               # .NET Aspire orchestration
-│   ├── Chaos.ServiceDefaults/       # Shared service configuration
-│   └── features/
-│       └── Chaos.Features.Todo/     # Modular Todo feature (entity, app service, controller)
-├── angular/                          # Angular 20 frontend (ABP 10.0.2)
-└── test/                             # Unit and integration tests
-```
+For a comprehensive walkthrough of how this project was built — including FluentUI integration, custom Account UI replacement, external login setup (Google & GitHub), and common issues — see **[GUIDE.md](GUIDE.md)**.
 
-## Feature Modules
+## Prerequisites
 
-### Todo
-Self-contained feature module at `src/features/Chaos.Features.Todo/` containing:
-- Entity, repository interface, EF Core configuration
-- Application service, DTOs, contracts
-- HTTP API controller
-- Module class that wires everything together
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download)
+- [Node.js](https://nodejs.org/) (18+)
+- [yarn](https://yarnpkg.com/)
+- [Docker](https://www.docker.com/) (required for Aspire-managed PostgreSQL)
 
-## Seed Data
+> PostgreSQL runs automatically via Docker when using Aspire. For manual setup, install PostgreSQL 13+ directly.
 
-| User    | Password  |
-|---------|-----------|
-| admin   | 1q2w3E*   |
+## Getting Started
 
-## Running with Docker Compose
+### 1. Install frontend dependencies
 
 ```bash
-docker compose up --build
+cd demos/chaos
+yarn install
+yarn build:css
 ```
 
-- **API**: http://localhost:44342 (Swagger at /swagger)
-- **Angular**: http://localhost:4200
-- **PostgreSQL**: localhost:5432
+This installs [Bulma](https://bulma.io/) and copies the CSS into the Blazor project's static assets.
 
-## Running with Aspire (Development)
+### 2. Run with Aspire (recommended)
 
 ```bash
-# Start the backend (PostgreSQL + DbMigrator + API)
-dotnet run --project src/Chaos.AppHost
-
-# In a separate terminal, start the Angular frontend
-cd angular
-npm install
-npm start
+dotnet run --project src/Chaos.AppHost/Chaos.AppHost.csproj
 ```
 
-The Aspire dashboard shows all service endpoints and health status.
+Aspire orchestrates the full stack:
+1. **PostgreSQL** container with PgAdmin (data persisted via Docker volume)
+2. **DbMigrator** runs EF Core migrations and seeds sample data
+3. **Blazor app** starts after migrations complete
 
-## API Endpoints
+Open the Aspire dashboard to see all resources and their endpoints.
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | /api/app/todo | List todos |
-| POST   | /api/app/todo | Create todo |
-| GET    | /api/app/todo/{id} | Get todo |
-| PUT    | /api/app/todo/{id} | Update todo |
-| DELETE | /api/app/todo/{id} | Delete todo |
+### 3. Run without Aspire
+
+Start PostgreSQL manually (or via Docker):
+
+```bash
+docker run -d --name chaos-pg \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16
+```
+
+Run the migrator, then the app:
+
+```bash
+dotnet run --project src/Chaos.DbMigrator/Chaos.DbMigrator.csproj
+dotnet run --project src/Chaos.Blazor/Chaos.Blazor.csproj
+```
+
+The app will be available at `https://localhost:44379`.
+
+### Default credentials
+
+- **Username:** admin
+- **Password:** 1q2w3E*
+
+### Connection string
+
+Configured in `src/Chaos.Blazor/appsettings.json`:
+
+```
+Host=localhost;Port=5432;Database=Chaos;Username=postgres;Password=postgres
+```
+
+When running via Aspire, the connection string is injected automatically.
+
+## Adding New Packages
+
+This project uses **yarn** for frontend dependency management.
+
+```bash
+# Add a package
+yarn add <package-name>
+
+# Remove a package
+yarn remove <package-name>
+```
+
+For .NET packages, use the standard `dotnet add package` workflow on the relevant `.csproj`.
+
+## Project Structure
+
+```
+chaos/
+├── package.json                          # Frontend deps (Bulma via yarn)
+├── common.props                          # Shared MSBuild properties
+├── Chaos.slnx                     # Solution file
+└── src/
+    ├── Chaos.AppHost/             # .NET Aspire orchestrator
+    ├── Chaos.ServiceDefaults/     # Shared Aspire defaults (OpenTelemetry, health checks)
+    ├── Chaos.Domain.Shared/       # Shared constants, enums, localization resources
+    ├── Chaos.Domain/              # Domain entities and aggregate roots
+    ├── Chaos.Application.Contracts/ # DTOs and application service interfaces
+    ├── Chaos.Application/         # Application service implementations
+    ├── Chaos.EntityFrameworkCore/  # EF Core DbContext, migrations, repository config
+    ├── Chaos.HttpApi/             # REST API controllers (auto-generated by ABP)
+    ├── Chaos.HttpApi.Client/      # HTTP API client proxies
+    ├── Chaos.Blazor/              # Main Blazor Server web application
+    ├── Chaos.DbMigrator/          # Database migration and seed console app
+    └── features/                         # Self-contained feature modules
+        ├── Chaos.Features.Todo/
+        ├── Chaos.Features.Chat/
+        └── Chaos.Features.Shopping/
+```
+
+The solution follows ABP's [Domain-Driven Design](https://docs.abp.io/en/abp/latest/Domain-Driven-Design) layering conventions. Each feature module contains its own domain entities, application services, EF Core configuration, UI components, localization resources, and permissions.
+
+## Features
+
+### Dashboard (`/dashboard`)
+
+Overview page displaying live metrics from the Todo system:
+- Total, completed, in-progress, and not-started todo counts
+- Active users, overdue items, and completion rate
+- Status distribution bars and recent activity feed
+
+### Todo (`/todos`)
+
+Full CRUD task management with:
+- Title, description, due date, and status tracking (Not Started / In Progress / Done)
+- Completion tracking (who completed it and when)
+- FluentUI DataGrid with sorting and filtering
+- Create/edit dialogs, delete confirmation, status badges
+- Permission-based access control
+
+### Chat (`/chat`)
+
+Real-time messaging powered by SignalR:
+- Live message broadcast to all connected users
+- Online user presence tracking
+- Message history (in-memory, not persisted)
+- User avatars and timestamps
+
+### Shopping (`/shopping`)
+
+Product catalog with shopping cart:
+- Browsable product grid with category filtering (Electronics, Clothing, Books, Home, Sports, Food)
+- Add-to-cart, quantity adjustment, item removal
+- Running total calculation
+- Seeded with 8 sample products
+
+## Localization
+
+The application supports **English** (en) and **Turkish** (tr).
+
+Localization JSON files are organized per module:
+
+| Module | Resource path |
+|--------|--------------|
+| Main app | `Chaos.Domain.Shared/Localization/Chaos/` |
+| Todo | `features/Chaos.Features.Todo/Localization/Todo/` |
+| Chat | `features/Chaos.Features.Chat/Localization/Chat/` |
+| Shopping | `features/Chaos.Features.Shopping/Localization/Shopping/` |
+
+### Adding a new language
+
+1. Copy an existing `en.json` to `<language-code>.json` in each localization directory (e.g. `de.json` for German).
+2. Translate all string values in the new file.
+3. ABP automatically discovers the new JSON resources at runtime — no code changes needed.
+
+Localization is used in Razor components via `@L["Key"]` and in code via `IStringLocalizer<TResource>`.
+
+## Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | [ABP Framework](https://abp.io/) v10.0 |
+| UI Components | [FluentUI Blazor](https://www.fluentui-blazor.net/) v4.13 |
+| CSS Framework | [Bulma](https://bulma.io/) v1.0 |
+| Runtime | .NET 10.0, Blazor Server (Interactive Server) |
+| Database | PostgreSQL with Entity Framework Core 10 |
+| Real-time | ASP.NET Core SignalR |
+| Orchestration | [.NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/) |
+| Auth | OpenIddict (OAuth 2.0 / OpenID Connect) |
+| Observability | OpenTelemetry, Serilog, ASP.NET Core Health Checks |
+| Mapping | Mapperly (source-generated) |
+| API Docs | Swagger / Swashbuckle |

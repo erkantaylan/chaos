@@ -1,4 +1,4 @@
-﻿using Chaos.EntityFrameworkCore;
+using Chaos.EntityFrameworkCore;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
 

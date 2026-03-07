@@ -1,7 +1,7 @@
 using System;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace Chaos.Todos;
+namespace Chaos.Domain;
 
 public class Todo : FullAuditedAggregateRoot<Guid>
 {
@@ -9,9 +9,11 @@ public class Todo : FullAuditedAggregateRoot<Guid>
 
     public string? Description { get; set; }
 
-    public bool IsCompleted { get; set; }
+    public TodoStatus Status { get; set; }
 
-    public Guid? CompletedByUserId { get; set; }
+    public DateTime? DueDate { get; set; }
 
-    public DateTime? CompletedTime { get; set; }
+    public Guid? CompleterId { get; set; }
+
+    public DateTime? CompletionTime { get; set; }
 }

@@ -1,4 +1,4 @@
-using Chaos.Todos;
+using Chaos.Domain;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 
@@ -14,6 +14,8 @@ public static class TodoEfCoreConfiguration
             b.ConfigureByConvention();
             b.Property(x => x.Title).IsRequired().HasMaxLength(256);
             b.Property(x => x.Description).HasMaxLength(1024);
+            b.Property(x => x.CompleterId);
+            b.Property(x => x.CompletionTime);
         });
     }
 }

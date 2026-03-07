@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +12,6 @@ using Volo.Abp.Uow;
 
 namespace Chaos.OpenIddict;
 
-/* Creates initial data that is needed to property run the application
- * and make client-to-server communication possible.
- */
 public class OpenIddictDataSeedContributor : OpenIddictDataSeedContributorBase, IDataSeedContributor, ITransientDependency
 {
     public OpenIddictDataSeedContributor(
@@ -36,10 +33,10 @@ public class OpenIddictDataSeedContributor : OpenIddictDataSeedContributorBase, 
 
     private async Task CreateScopesAsync()
     {
-        await CreateScopesAsync(new OpenIddictScopeDescriptor 
+        await CreateScopesAsync(new OpenIddictScopeDescriptor
         {
-            Name = "Chaos", 
-            DisplayName = "Chaos API", 
+            Name = "Chaos",
+            DisplayName = "Chaos API",
             Resources = { "Chaos" }
         });
     }
@@ -57,8 +54,6 @@ public class OpenIddictDataSeedContributor : OpenIddictDataSeedContributorBase, 
 
         var configurationSection = Configuration.GetSection("OpenIddict:Applications");
 
-
-        //Console Test / Angular Client
         var consoleAndAngularClientId = configurationSection["Chaos_App:ClientId"];
         if (!consoleAndAngularClientId.IsNullOrWhiteSpace())
         {
@@ -86,13 +81,6 @@ public class OpenIddictDataSeedContributor : OpenIddictDataSeedContributorBase, 
             );
         }
 
-        
-        
-
-
-
-
-        // Swagger Client
         var swaggerClientId = configurationSection["Chaos_Swagger:ClientId"];
         if (!swaggerClientId.IsNullOrWhiteSpace())
         {
@@ -112,7 +100,5 @@ public class OpenIddictDataSeedContributor : OpenIddictDataSeedContributorBase, 
                 logoUri: "/images/clients/swagger.svg"
             );
         }
-
-
     }
 }

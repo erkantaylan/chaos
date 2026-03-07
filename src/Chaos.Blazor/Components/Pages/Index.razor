@@ -1,0 +1,58 @@
+@page "/"
+@inherits ChaosComponentBase
+@using Microsoft.FluentUI.AspNetCore.Components
+
+<FluentGrid Spacing="3" Justify="JustifyContent.FlexStart">
+    <FluentGridItem xs="12" md="8">
+        <FluentCard>
+            <AuthorizeView>
+                <NotAuthorized>
+                    <FluentLabel Typo="Typography.H4" Style="margin-bottom: 8px;">@L["Welcome"]</FluentLabel>
+                    <FluentLabel Style="margin-bottom: 16px;">@L["LongWelcomeMessage"]</FluentLabel>
+                    <FluentButton Appearance="Appearance.Accent" OnClick="Login"
+                                  IconStart="@(new Icons.Regular.Size20.PersonArrowRight())"
+                                  Style="margin-bottom: 16px;">@L["Login"]</FluentButton>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <FluentLabel Typo="Typography.H5" Style="margin-bottom: 8px;">@L["GettingStarted"]</FluentLabel>
+            <FluentLabel Style="margin-bottom: 8px;">
+                @L["GettingStartedDescription"]
+            </FluentLabel>
+            <FluentAnchor Href="https://abp.io/docs/latest/getting-started" Target="_blank"
+                          Appearance="Appearance.Accent" Style="margin-bottom: 16px;">@L["GettingStarted"]</FluentAnchor>
+
+            <FluentLabel Typo="Typography.H5" Style="margin-bottom: 8px; margin-top: 16px;">@L["WebAppTutorial"]</FluentLabel>
+            <FluentLabel Style="margin-bottom: 8px;">
+                @L["WebAppTutorialDescription"]
+            </FluentLabel>
+            <FluentAnchor Href="https://abp.io/docs/latest/tutorials/book-store/part-1?UI=MVC&DB=EF"
+                          Target="_blank" Appearance="Appearance.Outline">@L["ExploreTutorial"]</FluentAnchor>
+        </FluentCard>
+    </FluentGridItem>
+
+    <FluentGridItem xs="12" md="4">
+        <FluentCard Style="margin-bottom: 16px;">
+            <FluentLabel Typo="Typography.H6" Style="margin-bottom: 8px;">@L["FluentUITheme"]</FluentLabel>
+            <FluentLabel Typo="Typography.Body">
+                @L["FluentUIThemeDescription"]
+            </FluentLabel>
+        </FluentCard>
+
+        <FluentCard>
+            <FluentLabel Typo="Typography.H6" Style="margin-bottom: 8px;">@L["Resources"]</FluentLabel>
+            <FluentStack Orientation="Orientation.Vertical" VerticalGap="4">
+                <FluentAnchor Href="https://github.com/abpframework/abp/releases" Target="_blank"
+                              Appearance="Appearance.Hypertext">@L["LatestReleaseLogs"]</FluentAnchor>
+                <FluentAnchor Href="https://abp.io/video-courses/essentials" Target="_blank"
+                              Appearance="Appearance.Hypertext">@L["VideoCourses"]</FluentAnchor>
+                <FluentAnchor Href="https://abp.io/docs/latest/Samples/Index" Target="_blank"
+                              Appearance="Appearance.Hypertext">@L["Samples"]</FluentAnchor>
+                <FluentAnchor Href="https://abp.io/community/" Target="_blank"
+                              Appearance="Appearance.Hypertext">@L["ABPCommunity"]</FluentAnchor>
+                <FluentAnchor Href="https://www.fluentui-blazor.net/" Target="_blank"
+                              Appearance="Appearance.Hypertext">@L["FluentUIBlazorDocs"]</FluentAnchor>
+            </FluentStack>
+        </FluentCard>
+    </FluentGridItem>
+</FluentGrid>

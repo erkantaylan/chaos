@@ -32,14 +32,10 @@ namespace Chaos.EntityFrameworkCore;
     )]
 public class ChaosEntityFrameworkCoreModule : AbpModule
 {
-    static ChaosEntityFrameworkCoreModule()
-    {
-        // Enable legacy timestamp behavior for PostgreSQL (converts local DateTime to UTC)
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-    }
-
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         ChaosEfCoreEntityExtensionMappings.Configure();
     }
 
@@ -47,8 +43,6 @@ public class ChaosEntityFrameworkCoreModule : AbpModule
     {
         context.Services.AddAbpDbContext<ChaosDbContext>(options =>
         {
-                /* Remove "includeAllEntities: true" to create
-                 * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
         });
 
@@ -59,11 +53,13 @@ public class ChaosEntityFrameworkCoreModule : AbpModule
 
         Configure<AbpDbContextOptions>(options =>
         {
-            /* The main point to change your DBMS.
-             * See also ChaosDbContextFactory for EF Core tooling. */
-
             options.UseNpgsql();
+        });
 
+        context.Services.AddAlwaysDisableUnitOfWorkTransaction();
+        Configure<AbpUnitOfWorkDefaultOptions>(options =>
+        {
+            options.TransactionBehavior = UnitOfWorkTransactionBehavior.Disabled;
         });
     }
 }

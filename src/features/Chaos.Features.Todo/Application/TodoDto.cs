@@ -1,7 +1,8 @@
 using System;
+using Chaos.Domain;
 using Volo.Abp.Application.Dtos;
 
-namespace Chaos.Todos;
+namespace Chaos.Application;
 
 public class TodoDto : FullAuditedEntityDto<Guid>
 {
@@ -9,13 +10,15 @@ public class TodoDto : FullAuditedEntityDto<Guid>
 
     public string? Description { get; set; }
 
-    public bool IsCompleted { get; set; }
+    public TodoStatus Status { get; set; }
 
-    public Guid? CompletedByUserId { get; set; }
+    public DateTime? DueDate { get; set; }
 
-    public string? CompletedByUserName { get; set; }
+    public Guid? CompleterId { get; set; }
 
-    public DateTime? CompletedTime { get; set; }
+    public DateTime? CompletionTime { get; set; }
 
     public string? CreatorUserName { get; set; }
+
+    public string? CompleterUserName { get; set; }
 }

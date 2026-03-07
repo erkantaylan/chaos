@@ -1,8 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\common.props" />
 
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
     <RootNamespace>Chaos</RootNamespace>
   </PropertyGroup>
 
@@ -11,21 +13,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.Emailing" />
-    <PackageReference Include="Volo.Abp.Caching" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" />
-    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" />
-    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" />
-    <PackageReference Include="Volo.Abp.AuditLogging.Domain" />
-    <PackageReference Include="Volo.Abp.FeatureManagement.Domain" />
-    <PackageReference Include="Volo.Abp.SettingManagement.Domain" />
-    <PackageReference Include="Volo.Abp.BlobStoring.Database.Domain" />
+    <PackageReference Include="Volo.Abp.Emailing" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.Caching" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.OpenIddict" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Domain" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.BlobStoring.Database.Domain" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.OpenIddict.Domain" />
-    <PackageReference Include="Volo.Abp.Identity.Domain" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Domain" />
+    <PackageReference Include="Volo.Abp.OpenIddict.Domain" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.Identity.Domain" Version="10.0.2" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="10.0.2" />
   </ItemGroup>
 
 </Project>
