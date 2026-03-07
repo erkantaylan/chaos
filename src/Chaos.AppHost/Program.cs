@@ -2,7 +2,6 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
     .WithPgAdmin()
-    .WithDataVolume("chaos-postgres-data")
     .PublishAsContainer();
 
 var database = postgres.AddDatabase("Default");

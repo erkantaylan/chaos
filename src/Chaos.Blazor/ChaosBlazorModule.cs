@@ -53,6 +53,9 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
 using Volo.Abp.Studio.Client.AspNetCore;
 
 namespace Chaos.Blazor;
@@ -156,6 +159,11 @@ public class ChaosBlazorModule : AbpModule
 
         // Register FluentUI services
         context.Services.AddFluentUIComponents();
+
+        // Register Blazorise services (required by ABP identity/tenant management UI)
+        context.Services.AddBlazorise()
+            .AddBootstrap5Providers()
+            .AddFontAwesomeIcons();
 
         ConfigureStudio(hostingEnvironment);
         ConfigureAuthentication(context);
