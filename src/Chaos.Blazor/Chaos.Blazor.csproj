@@ -37,6 +37,7 @@
     <ProjectReference Include="..\features\Chaos.Features.Todo\Chaos.Features.Todo.csproj" />
     <ProjectReference Include="..\features\Chaos.Features.Chat\Chaos.Features.Chat.csproj" />
     <ProjectReference Include="..\features\Chaos.Features.Shopping\Chaos.Features.Shopping.csproj" />
+    <ProjectReference Include="..\features\Chaos.Features.Blog\Chaos.Features.Blog.csproj" />
     <PackageReference Include="Volo.Abp.Autofac" />
     <PackageReference Include="Volo.Abp.Swashbuckle" />
     <PackageReference Include="Volo.Abp.AspNetCore.Serilog" />

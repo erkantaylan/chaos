@@ -1,0 +1,109 @@
+@page "/blog"
+@page "/"
+@attribute [AllowAnonymous]
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using Chaos.Application
+@using Chaos.Domain
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Application.Dtos
+@inject IBlogPostAppService BlogPostAppService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<BlogResource> L
+
+<FluentCard>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <FluentLabel Typo="Typography.H4">@L["Blog"]</FluentLabel>
+    </div>
+
+    @if (_loading)
+    {
+        <FluentProgress />
+    }
+    else if (_posts.Count == 0)
+    {
+        <div style="text-align: center; padding: 48px 0; color: var(--neutral-foreground-hint);">
+            <FluentIcon Value="@(new Icons.Regular.Size48.DocumentText())" Color="Color.Neutral" />
+            <FluentLabel Style="display: block; margin-top: 8px;">@L["NoPublishedPosts"]</FluentLabel>
+        </div>
+    }
+    else
+    {
+        <div class="columns is-multiline">
+            @foreach (var post in _posts)
+            {
+                <div class="column is-6">
+                    <FluentCard Style="height: 100%; cursor: pointer;" @onclick="@(() => ViewPost(post.Slug))">
+                        <div style="display: flex; flex-direction: column; height: 100%; gap: 8px;">
+                            @if (!string.IsNullOrEmpty(post.CoverImageUrl))
+                            {
+                                <div style="background: var(--neutral-layer-3); border-radius: 4px; height: 160px; overflow: hidden;">
+                                    <img src="@post.CoverImageUrl" alt="@post.Title" style="width: 100%; height: 100%; object-fit: cover;" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="background: var(--neutral-layer-3); border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center;">
+                                    <FluentIcon Value="@(new Icons.Regular.Size48.DocumentText())" Color="Color.Neutral" />
+                                </div>
+                            }
+                            <FluentLabel Typo="Typography.H6">@post.Title</FluentLabel>
+                            @if (post.PublishedAt.HasValue)
+                            {
+                                <FluentLabel Typo="Typography.Body" Style="color: var(--neutral-foreground-hint); font-size: 0.85em;">
+                                    @post.PublishedAt.Value.ToString("MMMM dd, yyyy")
+                                </FluentLabel>
+                            }
+                            @if (!string.IsNullOrEmpty(post.Summary))
+                            {
+                                <FluentLabel Typo="Typography.Body" Style="flex: 1; color: var(--neutral-foreground-hint);">
+                                    @post.Summary
+                                </FluentLabel>
+                            }
+                            <div style="margin-top: 8px;">
+                                <FluentButton Appearance="Appearance.Accent"
+                                              OnClick="@(() => ViewPost(post.Slug))"
+                                              IconStart="@(new Icons.Regular.Size16.ArrowRight())">
+                                    @L["ReadMore"]
+                                </FluentButton>
+                            </div>
+                        </div>
+                    </FluentCard>
+                </div>
+            }
+        </div>
+    }
+</FluentCard>
+
+@code {
+    private List<BlogPostDto> _posts = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostsAsync();
+    }
+
+    private async Task LoadPostsAsync()
+    {
+        _loading = true;
+        try
+        {
+            var result = await BlogPostAppService.GetPublishedListAsync(new BlogPostGetListInput
+            {
+                MaxResultCount = 20,
+                SkipCount = 0
+            });
+            _posts = result.Items.ToList();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ViewPost(string slug)
+    {
+        NavigationManager.NavigateTo($"/blog/{slug}");
+    }
+}

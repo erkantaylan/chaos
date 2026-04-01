@@ -28,6 +28,7 @@ public class ChaosDbContext :
 {
     public DbSet<Todo> Todos { get; set; }
     public DbSet<Product> Products { get; set; }
+    public DbSet<BlogPost> BlogPosts { get; set; }
 
     #region Entities from the modules
 
@@ -69,5 +70,6 @@ public class ChaosDbContext :
 
         builder.ConfigureTodoFeature();
         builder.ConfigureShoppingFeature();
+        builder.ConfigureBlogFeature();
     }
 }

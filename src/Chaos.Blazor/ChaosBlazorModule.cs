@@ -61,6 +61,7 @@ namespace Chaos.Blazor;
     typeof(TodoFeatureModule),
     typeof(ChatFeatureModule),
     typeof(ShoppingFeatureModule),
+    typeof(BlogFeatureModule),
     typeof(AbpAutofacModule),
     typeof(AbpSwashbuckleModule),
     typeof(AbpAccountWebOpenIddictModule),

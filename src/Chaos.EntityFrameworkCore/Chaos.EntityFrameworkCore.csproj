@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Chaos.Domain\Chaos.Domain.csproj" />
     <ProjectReference Include="..\features\Chaos.Features.Todo\Chaos.Features.Todo.csproj" />
     <ProjectReference Include="..\features\Chaos.Features.Shopping\Chaos.Features.Shopping.csproj" />
+    <ProjectReference Include="..\features\Chaos.Features.Blog\Chaos.Features.Blog.csproj" />
   </ItemGroup>
 
   <ItemGroup>

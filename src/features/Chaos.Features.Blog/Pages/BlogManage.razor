@@ -1,0 +1,286 @@
+@page "/blog/manage"
+@attribute [Authorize]
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using Chaos.Application
+@using Chaos.Domain
+@using Chaos.Permissions
+@using Microsoft.Extensions.Localization
+@using Volo.Abp.Application.Dtos
+@inject IBlogPostAppService BlogPostAppService
+@inject IDialogService DialogService
+@inject IToastService ToastService
+@inject IStringLocalizer<BlogResource> L
+
+<FluentCard>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <FluentLabel Typo="Typography.H5">@L["ManagePosts"]</FluentLabel>
+        <FluentButton Appearance="Appearance.Accent" OnClick="OpenCreateDialog"
+                      IconStart="@(new Icons.Regular.Size20.Add())">@L["NewBlogPost"]</FluentButton>
+    </div>
+
+    @if (_loading)
+    {
+        <FluentProgress />
+    }
+    else if (_posts.Count == 0)
+    {
+        <FluentLabel>@L["NoPosts"]</FluentLabel>
+    }
+    else
+    {
+        <FluentDataGrid Items="@_posts.AsQueryable()" TGridItem="BlogPostDto" Style="width: 100%;">
+            <PropertyColumn Property="@(p => p.Title)" Title="@L["Title"]" />
+            <PropertyColumn Property="@(p => p.Slug)" Title="@L["Slug"]" />
+            <TemplateColumn Title="@L["Status"]">
+                @{
+                    var appearance = context.Status switch
+                    {
+                        BlogStatus.Published => Appearance.Accent,
+                        BlogStatus.Draft => Appearance.Neutral,
+                        _ => Appearance.Outline
+                    };
+                }
+                <FluentBadge Appearance="@appearance">@L[$"Enum:BlogStatus.{context.Status}"]</FluentBadge>
+            </TemplateColumn>
+            <TemplateColumn Title="@L["PublishedAt"]">
+                @context.PublishedAt?.ToString("yyyy-MM-dd HH:mm")
+            </TemplateColumn>
+            <TemplateColumn Title="@L["Actions"]">
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => OpenEditDialog(context))"
+                              IconStart="@(new Icons.Regular.Size16.Edit())" Title="@L["Edit"]" />
+                @if (context.Status == BlogStatus.Draft)
+                {
+                    <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => PublishAsync(context))"
+                                  IconStart="@(new Icons.Regular.Size16.ArrowUpload())" Title="@L["Publish"]" />
+                }
+                @if (context.Status == BlogStatus.Published)
+                {
+                    <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => ArchiveAsync(context))"
+                                  IconStart="@(new Icons.Regular.Size16.Archive())" Title="@L["Archive"]" />
+                }
+                <FluentButton Appearance="Appearance.Stealth" OnClick="@(() => DeleteAsync(context))"
+                              IconStart="@(new Icons.Regular.Size16.Delete())" Title="@L["Delete"]" />
+            </TemplateColumn>
+        </FluentDataGrid>
+    }
+</FluentCard>
+
+@* Create Dialog *@
+@if (_createDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_createDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseCreateDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">@L["NewBlogPost"]</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_newPost">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_newPost.Title" Label="@L["Title"]" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_newPost.Slug" Label="@L["Slug"]" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextArea @bind-Value="_newPost.Summary" Label="@L["Summary"]"
+                                    Maxlength="512" Rows="2" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_newPost.CoverImageUrl" Label="@L["CoverImageUrl"]"
+                                     Maxlength="512" Style="width: 100%;" />
+                    <FluentTextArea @bind-Value="_newPost.Content" Label="@L["Content"]" Required="true"
+                                    Rows="12" Style="width: 100%;" />
+                    <FluentSelect TOption="BlogStatus" @bind-SelectedOption="_newPost.Status" Label="@L["Status"]"
+                                  Items="@(Enum.GetValues<BlogStatus>())"
+                                  OptionText="@(s => L[$"Enum:BlogStatus.{s}"])"
+                                  Style="width: 100%;" />
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseCreateDialog">@L["Cancel"]</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="CreateAsync">@L["Save"]</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@* Edit Dialog *@
+@if (_editDialogVisible)
+{
+    <FluentDialog @bind-Hidden="@_editDialogHidden" Modal="true" TrapFocus="true"
+                  PreventDismissOnOverlayClick="false" @ondialogdismiss="CloseEditDialog">
+        <FluentDialogHeader>
+            <FluentLabel Typo="Typography.H6">@L["EditBlogPost"]</FluentLabel>
+        </FluentDialogHeader>
+        <FluentDialogBody>
+            <EditForm Model="_editPost">
+                <DataAnnotationsValidator />
+                <FluentStack Orientation="Orientation.Vertical">
+                    <FluentTextField @bind-Value="_editPost.Title" Label="@L["Title"]" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editPost.Slug" Label="@L["Slug"]" Required="true"
+                                     Maxlength="256" Style="width: 100%;" />
+                    <FluentTextArea @bind-Value="_editPost.Summary" Label="@L["Summary"]"
+                                    Maxlength="512" Rows="2" Style="width: 100%;" />
+                    <FluentTextField @bind-Value="_editPost.CoverImageUrl" Label="@L["CoverImageUrl"]"
+                                     Maxlength="512" Style="width: 100%;" />
+                    <FluentTextArea @bind-Value="_editPost.Content" Label="@L["Content"]" Required="true"
+                                    Rows="12" Style="width: 100%;" />
+                    <FluentSelect TOption="BlogStatus" @bind-SelectedOption="_editPost.Status" Label="@L["Status"]"
+                                  Items="@(Enum.GetValues<BlogStatus>())"
+                                  OptionText="@(s => L[$"Enum:BlogStatus.{s}"])"
+                                  Style="width: 100%;" />
+                </FluentStack>
+            </EditForm>
+        </FluentDialogBody>
+        <FluentDialogFooter>
+            <FluentButton Appearance="Appearance.Neutral" OnClick="CloseEditDialog">@L["Cancel"]</FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="UpdateAsync">@L["Save"]</FluentButton>
+        </FluentDialogFooter>
+    </FluentDialog>
+}
+
+@code {
+    private List<BlogPostDto> _posts = new();
+    private bool _loading = true;
+
+    private bool _createDialogVisible;
+    private bool _createDialogHidden = true;
+    private bool _editDialogVisible;
+    private bool _editDialogHidden = true;
+    private CreateUpdateBlogPostDto _newPost = new();
+    private CreateUpdateBlogPostDto _editPost = new();
+    private Guid _editingPostId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostsAsync();
+    }
+
+    private async Task LoadPostsAsync()
+    {
+        _loading = true;
+        try
+        {
+            var result = await BlogPostAppService.GetListAsync(new BlogPostGetListInput
+            {
+                MaxResultCount = 100,
+                SkipCount = 0
+            });
+            _posts = result.Items.ToList();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void OpenCreateDialog()
+    {
+        _newPost = new CreateUpdateBlogPostDto { Status = BlogStatus.Draft };
+        _createDialogVisible = true;
+        _createDialogHidden = false;
+    }
+
+    private void CloseCreateDialog()
+    {
+        _createDialogVisible = false;
+        _createDialogHidden = true;
+    }
+
+    private void OpenEditDialog(BlogPostDto post)
+    {
+        _editingPostId = post.Id;
+        _editPost = new CreateUpdateBlogPostDto
+        {
+            Title = post.Title,
+            Slug = post.Slug,
+            Content = post.Content,
+            Summary = post.Summary,
+            CoverImageUrl = post.CoverImageUrl,
+            Status = post.Status,
+            PublishedAt = post.PublishedAt
+        };
+        _editDialogVisible = true;
+        _editDialogHidden = false;
+    }
+
+    private void CloseEditDialog()
+    {
+        _editDialogVisible = false;
+        _editDialogHidden = true;
+    }
+
+    private async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newPost.Title) || string.IsNullOrWhiteSpace(_newPost.Slug))
+            return;
+
+        await BlogPostAppService.CreateAsync(_newPost);
+        CloseCreateDialog();
+        ToastService.ShowSuccess(L["BlogPostCreated"]);
+        await LoadPostsAsync();
+    }
+
+    private async Task UpdateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_editPost.Title) || string.IsNullOrWhiteSpace(_editPost.Slug))
+            return;
+
+        await BlogPostAppService.UpdateAsync(_editingPostId, _editPost);
+        CloseEditDialog();
+        ToastService.ShowSuccess(L["BlogPostUpdated"]);
+        await LoadPostsAsync();
+    }
+
+    private async Task PublishAsync(BlogPostDto post)
+    {
+        var input = new CreateUpdateBlogPostDto
+        {
+            Title = post.Title,
+            Slug = post.Slug,
+            Content = post.Content,
+            Summary = post.Summary,
+            CoverImageUrl = post.CoverImageUrl,
+            Status = BlogStatus.Published,
+            PublishedAt = DateTime.UtcNow
+        };
+
+        await BlogPostAppService.UpdateAsync(post.Id, input);
+        ToastService.ShowSuccess(L["BlogPostUpdated"]);
+        await LoadPostsAsync();
+    }
+
+    private async Task ArchiveAsync(BlogPostDto post)
+    {
+        var input = new CreateUpdateBlogPostDto
+        {
+            Title = post.Title,
+            Slug = post.Slug,
+            Content = post.Content,
+            Summary = post.Summary,
+            CoverImageUrl = post.CoverImageUrl,
+            Status = BlogStatus.Archived,
+            PublishedAt = post.PublishedAt
+        };
+
+        await BlogPostAppService.UpdateAsync(post.Id, input);
+        ToastService.ShowSuccess(L["BlogPostUpdated"]);
+        await LoadPostsAsync();
+    }
+
+    private async Task DeleteAsync(BlogPostDto post)
+    {
+        var dialog = await DialogService.ShowConfirmationAsync(
+            L["BlogPostDeletionConfirmation"],
+            L["Delete"],
+            L["Cancel"],
+            L["Confirm"]);
+
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await BlogPostAppService.DeleteAsync(post.Id);
+            ToastService.ShowInfo(L["BlogPostDeleted"]);
+            await LoadPostsAsync();
+        }
+    }
+}

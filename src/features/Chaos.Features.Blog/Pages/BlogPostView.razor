@@ -1,0 +1,108 @@
+@page "/blog/{Slug}"
+@attribute [AllowAnonymous]
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
+@using Chaos.Application
+@using Chaos.Domain
+@using Microsoft.Extensions.Localization
+@using Markdig
+@inject IBlogPostAppService BlogPostAppService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<BlogResource> L
+
+@if (_loading)
+{
+    <FluentCard>
+        <FluentProgress />
+    </FluentCard>
+}
+else if (_post == null)
+{
+    <FluentCard>
+        <FluentLabel Typo="Typography.H5">@L["NoPosts"]</FluentLabel>
+        <FluentButton Appearance="Appearance.Accent" OnClick="GoBack"
+                      IconStart="@(new Icons.Regular.Size16.ArrowLeft())" Style="margin-top: 16px;">
+            @L["BackToBlog"]
+        </FluentButton>
+    </FluentCard>
+}
+else
+{
+    <FluentCard>
+        <div style="margin-bottom: 16px;">
+            <FluentButton Appearance="Appearance.Stealth" OnClick="GoBack"
+                          IconStart="@(new Icons.Regular.Size16.ArrowLeft())">
+                @L["BackToBlog"]
+            </FluentButton>
+        </div>
+
+        <article>
+            <FluentLabel Typo="Typography.H3" Style="margin-bottom: 8px;">@_post.Title</FluentLabel>
+
+            @if (_post.PublishedAt.HasValue)
+            {
+                <FluentLabel Typo="Typography.Body" Style="color: var(--neutral-foreground-hint); margin-bottom: 24px; display: block;">
+                    @_post.PublishedAt.Value.ToString("MMMM dd, yyyy")
+                </FluentLabel>
+            }
+
+            @if (!string.IsNullOrEmpty(_post.CoverImageUrl))
+            {
+                <div style="margin-bottom: 24px; border-radius: 8px; overflow: hidden;">
+                    <img src="@_post.CoverImageUrl" alt="@_post.Title" style="width: 100%; max-height: 400px; object-fit: cover;" />
+                </div>
+            }
+
+            <div class="blog-content">
+                @((MarkupString)_renderedContent)
+            </div>
+        </article>
+    </FluentCard>
+}
+
+@code {
+    [Parameter]
+    public string Slug { get; set; } = null!;
+
+    private BlogPostDto? _post;
+    private string _renderedContent = string.Empty;
+    private bool _loading = true;
+
+    private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .Build();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostAsync();
+    }
+
+    private async Task LoadPostAsync()
+    {
+        _loading = true;
+        try
+        {
+            var result = await BlogPostAppService.GetPublishedListAsync(new BlogPostGetListInput
+            {
+                MaxResultCount = 100,
+                SkipCount = 0
+            });
+
+            _post = result.Items.FirstOrDefault(p => p.Slug == Slug);
+
+            if (_post != null)
+            {
+                _renderedContent = Markdown.ToHtml(_post.Content, Pipeline);
+            }
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/blog");
+    }
+}
