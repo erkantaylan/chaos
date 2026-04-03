@@ -1,0 +1,97 @@
+@inherits LayoutComponentBase
+@using Microsoft.FluentUI.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Localization
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<BlogResource> L
+
+<FluentToastProvider />
+<FluentDialogProvider />
+<FluentTooltipProvider />
+
+<div class="public-layout">
+    <header class="public-header">
+        <div class="public-header-inner">
+            <a href="/" class="site-title">Chaos</a>
+            <nav class="public-nav">
+                <AuthorizeView>
+                    <Authorized>
+                        <FluentAnchor Href="/dashboard" Appearance="Appearance.Stealth"
+                                      Style="color: var(--neutral-foreground-hint);">Dashboard</FluentAnchor>
+                    </Authorized>
+                    <NotAuthorized>
+                        <FluentAnchor Href="/Account/Login" Appearance="Appearance.Stealth"
+                                      Style="color: var(--neutral-foreground-hint);">@L["Login"]</FluentAnchor>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </nav>
+        </div>
+    </header>
+
+    <main class="public-content">
+        @Body
+    </main>
+
+    <footer class="public-footer">
+        <span>&copy; @DateTime.Now.Year Chaos</span>
+    </footer>
+</div>
+
+<style>
+    .public-layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: var(--neutral-layer-1);
+    }
+
+    .public-header {
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+        padding: 0 24px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+    }
+
+    .public-header-inner {
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .site-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--neutral-foreground-rest);
+        text-decoration: none;
+    }
+
+    .site-title:hover {
+        color: var(--accent-fill-rest);
+    }
+
+    .public-nav {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .public-content {
+        flex: 1;
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 32px 24px;
+    }
+
+    .public-footer {
+        border-top: 1px solid var(--neutral-stroke-divider-rest);
+        padding: 16px 24px;
+        text-align: center;
+        color: var(--neutral-foreground-hint);
+        font-size: 0.85rem;
+    }
+</style>

@@ -1,6 +1,7 @@
 @page "/blog"
 @page "/"
 @attribute [AllowAnonymous]
+@layout Chaos.Layout.PublicLayout
 @using Microsoft.FluentUI.AspNetCore.Components
 @using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
 @using Chaos.Application
@@ -29,10 +30,10 @@
     }
     else
     {
-        <div class="columns is-multiline">
+        <FluentGrid Spacing="3" Justify="JustifyContent.FlexStart">
             @foreach (var post in _posts)
             {
-                <div class="column is-6">
+                <FluentGridItem xs="12" sm="6">
                     <FluentCard Style="height: 100%; cursor: pointer;" @onclick="@(() => ViewPost(post.Slug))">
                         <div style="display: flex; flex-direction: column; height: 100%; gap: 8px;">
                             @if (!string.IsNullOrEmpty(post.CoverImageUrl))
@@ -69,9 +70,9 @@
                             </div>
                         </div>
                     </FluentCard>
-                </div>
+                </FluentGridItem>
             }
-        </div>
+        </FluentGrid>
     }
 </FluentCard>
 

@@ -22,6 +22,9 @@
             <FluentButton Appearance="Appearance.Stealth" OnClick="@ToggleNavMenu"
                           IconStart="@(new Icons.Regular.Size24.Navigation())" />
             <FluentLabel Typo="Typography.H5" Style="margin-left: 12px; color: white;">@L["AppName"]</FluentLabel>
+            <FluentAnchor Href="/" Appearance="Appearance.Stealth"
+                          Style="color: rgba(255,255,255,0.7); margin-left: 16px; font-size: 0.85rem;"
+                          Target="_blank">Blog</FluentAnchor>
             <FluentSpacer />
             <FluentSelect TOption="LanguageInfo"
                           Items="@_languages"

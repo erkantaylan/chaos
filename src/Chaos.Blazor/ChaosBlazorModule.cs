@@ -16,7 +16,6 @@ using OpenIddict.Validation.AspNetCore;
 using OpenIddict.Server.AspNetCore;
 using Microsoft.Extensions.Options;
 using Chaos.Blazor.Components;
-using Chaos.Blazor.Menus;
 using Chaos.EntityFrameworkCore;
 using Chaos.Localization;
 using Chaos.MultiTenancy;
@@ -278,10 +277,6 @@ public class ChaosBlazorModule : AbpModule
 
     private void ConfigureMenu(ServiceConfigurationContext context)
     {
-        Configure<AbpNavigationOptions>(options =>
-        {
-            options.MenuContributors.Add(new ChaosMenuContributor());
-        });
     }
 
     private void ConfigureRouter(ServiceConfigurationContext context)

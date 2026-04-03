@@ -10,9 +10,9 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @implements IDisposable
 
-<div class="columns" style="height: calc(100vh - 130px);">
+<FluentGrid Spacing="3" Style="height: calc(100vh - 130px);">
     @* Main chat area *@
-    <div class="column" style="display: flex; flex-direction: column; height: 100%;">
+    <FluentGridItem xs="12" md="9" Style="display: flex; flex-direction: column; height: 100%;">
         <FluentCard Style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <FluentLabel Typo="Typography.H5">@L["Chat:Title"]</FluentLabel>
@@ -63,10 +63,10 @@
                 </FluentButton>
             </div>
         </FluentCard>
-    </div>
+    </FluentGridItem>
 
     @* Online users sidebar *@
-    <div class="column is-3" style="height: 100%;">
+    <FluentGridItem xs="12" md="3" Style="height: 100%;">
         <FluentCard Style="height: 100%; overflow-y: auto;">
             <FluentLabel Typo="Typography.H6" Style="margin-bottom: 12px;">
                 @L["Chat:OnlineUsers"] (@_onlineUsers.Count)
@@ -79,8 +79,8 @@
                 </div>
             }
         </FluentCard>
-    </div>
-</div>
+    </FluentGridItem>
+</FluentGrid>
 
 @code {
     private List<ChatMessage> _messages = new();
