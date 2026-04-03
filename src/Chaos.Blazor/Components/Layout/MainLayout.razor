@@ -16,13 +16,14 @@
 <FluentTooltipProvider />
 
 <FluentLayout>
-    <FluentHeader>
+    <FluentHeader Style="@_headerTokens">
         <FluentStack Orientation="Orientation.Horizontal" HorizontalAlignment="HorizontalAlignment.Left"
                      VerticalAlignment="VerticalAlignment.Center" Style="width: 100%;">
             <FluentButton Appearance="Appearance.Stealth" OnClick="@ToggleNavMenu"
                           IconStart="@(new Icons.Regular.Size24.Navigation())" />
-            <FluentLabel Typo="Typography.H5" Style="margin-left: 12px; color: white;">@L["AppName"]</FluentLabel>
-            <a href="/" target="_blank" style="color: rgba(255,255,255,0.7); margin-left: 16px; font-size: 0.85rem; text-decoration: none;">Blog</a>
+            <FluentLabel Typo="Typography.H5" Style="margin-left: 12px;">@L["AppName"]</FluentLabel>
+            <FluentAnchor Href="/" Appearance="Appearance.Stealth" Target="_blank"
+                          Style="margin-left: 16px; font-size: 0.85rem; opacity: 0.8;">Blog</FluentAnchor>
             <FluentSpacer />
             <FluentSelect TOption="LanguageInfo"
                           Items="@_languages"
@@ -32,16 +33,17 @@
                           OptionValue="@(l => l.CultureName)"
                           OptionSelected="@(l => l.CultureName == _selectedLanguage?.CultureName)"
                           Width="140px"
-                          Style="min-width: 140px; --neutral-fill-input-rest: rgba(255,255,255,0.1); --neutral-foreground-rest: white; --neutral-fill-input-hover: rgba(255,255,255,0.15); color: white;" />
+                          Style="min-width: 140px;" />
             <AuthorizeView>
                 <Authorized>
-                    <FluentLabel Style="color: white; margin-right: 8px;">@context.User.Identity?.Name</FluentLabel>
-                    <a href="/Account/Logout" style="color: white; display: flex; align-items: center;">
-                        <FluentIcon Value="@(new Icons.Regular.Size20.SignOut())" Color="Color.Custom" CustomColor="white" />
-                    </a>
+                    <FluentLabel Style="margin-right: 8px;">@context.User.Identity?.Name</FluentLabel>
+                    <FluentAnchor Href="/Account/Logout" Appearance="Appearance.Stealth">
+                        <FluentIcon Value="@(new Icons.Regular.Size20.SignOut())" />
+                    </FluentAnchor>
                 </Authorized>
                 <NotAuthorized>
-                    <a href="/Account/Login" style="color: white; text-decoration: none; font-weight: 500;">@L["Login"]</a>
+                    <FluentAnchor Href="/Account/Login" Appearance="Appearance.Stealth"
+                                  Style="font-weight: 500;">@L["Login"]</FluentAnchor>
                 </NotAuthorized>
             </AuthorizeView>
         </FluentStack>
@@ -64,6 +66,18 @@
     private bool _navMenuExpanded = true;
     private List<LanguageInfo> _languages = new();
     private LanguageInfo? _selectedLanguage;
+
+    // Override design tokens so all FluentUI children render white on the accent header
+    private const string _headerTokens =
+        "--neutral-foreground-rest: white;" +
+        "--neutral-foreground-hover: white;" +
+        "--neutral-fill-stealth-rest: transparent;" +
+        "--neutral-fill-stealth-hover: rgba(255,255,255,0.1);" +
+        "--neutral-fill-input-rest: rgba(255,255,255,0.1);" +
+        "--neutral-fill-input-hover: rgba(255,255,255,0.15);" +
+        "--neutral-stroke-rest: rgba(255,255,255,0.2);" +
+        "--accent-foreground-rest: white;" +
+        "--accent-foreground-hover: rgba(255,255,255,0.9);";
 
     protected override void OnInitialized()
     {
