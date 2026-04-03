@@ -30,7 +30,7 @@ namespace Chaos.Migrations
                 FROM numbered WHERE "AppBlogPosts"."Id" = numbered."Id";
 
                 SELECT setval(pg_get_serial_sequence('"AppBlogPosts"', 'PostNumber'),
-                    COALESCE((SELECT MAX("PostNumber") FROM "AppBlogPosts"), 0));
+                    GREATEST((SELECT MAX("PostNumber") FROM "AppBlogPosts"), 1));
                 """);
 
             migrationBuilder.CreateIndex(
