@@ -22,9 +22,7 @@
             <FluentButton Appearance="Appearance.Stealth" OnClick="@ToggleNavMenu"
                           IconStart="@(new Icons.Regular.Size24.Navigation())" />
             <FluentLabel Typo="Typography.H5" Style="margin-left: 12px; color: white;">@L["AppName"]</FluentLabel>
-            <FluentAnchor Href="/" Appearance="Appearance.Stealth"
-                          Style="color: rgba(255,255,255,0.7); margin-left: 16px; font-size: 0.85rem;"
-                          Target="_blank">Blog</FluentAnchor>
+            <a href="/" target="_blank" style="color: rgba(255,255,255,0.7); margin-left: 16px; font-size: 0.85rem; text-decoration: none;">Blog</a>
             <FluentSpacer />
             <FluentSelect TOption="LanguageInfo"
                           Items="@_languages"
@@ -34,16 +32,16 @@
                           OptionValue="@(l => l.CultureName)"
                           OptionSelected="@(l => l.CultureName == _selectedLanguage?.CultureName)"
                           Width="140px"
-                          Style="min-width: 140px; --neutral-fill-input-rest: rgba(255,255,255,0.1); --neutral-foreground-rest: white; color: white;" />
+                          Style="min-width: 140px; --neutral-fill-input-rest: rgba(255,255,255,0.1); --neutral-foreground-rest: white; --neutral-fill-input-hover: rgba(255,255,255,0.15); color: white;" />
             <AuthorizeView>
                 <Authorized>
                     <FluentLabel Style="color: white; margin-right: 8px;">@context.User.Identity?.Name</FluentLabel>
-                    <FluentAnchor Href="/Account/Logout" Appearance="Appearance.Stealth">
-                        <FluentIcon Value="@(new Icons.Regular.Size20.SignOut())" Color="Color.Fill" />
-                    </FluentAnchor>
+                    <a href="/Account/Logout" style="color: white; display: flex; align-items: center;">
+                        <FluentIcon Value="@(new Icons.Regular.Size20.SignOut())" Color="Color.Custom" CustomColor="white" />
+                    </a>
                 </Authorized>
                 <NotAuthorized>
-                    <FluentAnchor Href="/Account/Login" Appearance="Appearance.Accent">@L["Login"]</FluentAnchor>
+                    <a href="/Account/Login" style="color: white; text-decoration: none; font-weight: 500;">@L["Login"]</a>
                 </NotAuthorized>
             </AuthorizeView>
         </FluentStack>
