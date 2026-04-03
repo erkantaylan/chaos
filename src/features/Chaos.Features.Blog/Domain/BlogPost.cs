@@ -5,6 +5,8 @@ namespace Chaos.Domain;
 
 public class BlogPost : FullAuditedAggregateRoot<Guid>
 {
+    public int PostNumber { get; set; }
+
     public string Title { get; set; } = null!;
 
     public string Slug { get; set; } = null!;

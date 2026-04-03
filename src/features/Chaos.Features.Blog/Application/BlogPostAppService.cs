@@ -80,6 +80,15 @@ public class BlogPostAppService
     }
 
     [AllowAnonymous]
+    public async Task<BlogPostDto?> GetByPostNumberAsync(int postNumber)
+    {
+        var queryable = await Repository.GetQueryableAsync();
+        var post = await AsyncExecuter.FirstOrDefaultAsync(
+            queryable.Where(p => p.PostNumber == postNumber && p.Status == BlogStatus.Published));
+        return post == null ? null : ObjectMapper.Map<BlogPost, BlogPostDto>(post);
+    }
+
+    [AllowAnonymous]
     public async Task<PagedResultDto<BlogPostDto>> GetPublishedListAsync(BlogPostGetListInput input)
     {
         var queryable = await Repository.GetQueryableAsync();

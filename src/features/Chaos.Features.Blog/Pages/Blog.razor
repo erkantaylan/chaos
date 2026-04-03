@@ -34,7 +34,7 @@
             @foreach (var post in _posts)
             {
                 <FluentGridItem xs="12" sm="6">
-                    <FluentCard Style="height: 100%; cursor: pointer;" @onclick="@(() => ViewPost(post.Slug))">
+                    <FluentCard Style="height: 100%; cursor: pointer;" @onclick="@(() => ViewPost(post.PostNumber, post.Slug))">
                         <div style="display: flex; flex-direction: column; height: 100%; gap: 8px;">
                             @if (!string.IsNullOrEmpty(post.CoverImageUrl))
                             {
@@ -63,7 +63,7 @@
                             }
                             <div style="margin-top: 8px;">
                                 <FluentButton Appearance="Appearance.Accent"
-                                              OnClick="@(() => ViewPost(post.Slug))"
+                                              OnClick="@(() => ViewPost(post.PostNumber, post.Slug))"
                                               IconStart="@(new Icons.Regular.Size16.ArrowRight())">
                                     @L["ReadMore"]
                                 </FluentButton>
@@ -103,8 +103,8 @@
         }
     }
 
-    private void ViewPost(string slug)
+    private void ViewPost(int postNumber, string slug)
     {
-        NavigationManager.NavigateTo($"/blog/{slug}");
+        NavigationManager.NavigateTo($"/blog/{postNumber}/{slug}");
     }
 }

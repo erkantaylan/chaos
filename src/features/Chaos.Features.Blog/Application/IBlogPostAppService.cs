@@ -8,4 +8,5 @@ namespace Chaos.Application;
 public interface IBlogPostAppService : ICrudAppService<BlogPostDto, Guid, BlogPostGetListInput, CreateUpdateBlogPostDto>
 {
     Task<PagedResultDto<BlogPostDto>> GetPublishedListAsync(BlogPostGetListInput input);
+    Task<BlogPostDto?> GetByPostNumberAsync(int postNumber);
 }

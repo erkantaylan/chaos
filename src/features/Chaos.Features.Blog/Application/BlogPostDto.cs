@@ -6,6 +6,8 @@ namespace Chaos.Application;
 
 public class BlogPostDto : FullAuditedEntityDto<Guid>
 {
+    public int PostNumber { get; set; }
+
     public string Title { get; set; } = null!;
 
     public string Slug { get; set; } = null!;
