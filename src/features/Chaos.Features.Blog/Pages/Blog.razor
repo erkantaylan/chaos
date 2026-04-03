@@ -2,8 +2,6 @@
 @page "/"
 @attribute [AllowAnonymous]
 @layout Chaos.Layout.PublicLayout
-@using Microsoft.FluentUI.AspNetCore.Components
-@using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons
 @using Chaos.Application
 @using Chaos.Domain
 @using Microsoft.Extensions.Localization
@@ -12,69 +10,68 @@
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<BlogResource> L
 
-<FluentCard>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <FluentLabel Typo="Typography.H4">@L["Blog"]</FluentLabel>
-    </div>
-
-    @if (_loading)
+@if (_loading)
+{
+    <p style="color: var(--neutral-foreground-hint);">@L["Loading"]</p>
+}
+else if (_posts.Count == 0)
+{
+    <p style="color: var(--neutral-foreground-hint);">@L["NoPublishedPosts"]</p>
+}
+else
+{
+    @foreach (var post in _posts)
     {
-        <FluentProgress />
-    }
-    else if (_posts.Count == 0)
-    {
-        <div style="text-align: center; padding: 48px 0; color: var(--neutral-foreground-hint);">
-            <FluentIcon Value="@(new Icons.Regular.Size48.DocumentText())" Color="Color.Neutral" />
-            <FluentLabel Style="display: block; margin-top: 8px;">@L["NoPublishedPosts"]</FluentLabel>
-        </div>
-    }
-    else
-    {
-        <FluentGrid Spacing="3" Justify="JustifyContent.FlexStart">
-            @foreach (var post in _posts)
+        <article class="post-item" @onclick="@(() => ViewPost(post.PostNumber, post.Slug))">
+            <h2 class="post-title">@post.Title</h2>
+            @if (post.PublishedAt.HasValue)
             {
-                <FluentGridItem xs="12" sm="6">
-                    <FluentCard Style="height: 100%; cursor: pointer;" @onclick="@(() => ViewPost(post.PostNumber, post.Slug))">
-                        <div style="display: flex; flex-direction: column; height: 100%; gap: 8px;">
-                            @if (!string.IsNullOrEmpty(post.CoverImageUrl))
-                            {
-                                <div style="background: var(--neutral-layer-3); border-radius: 4px; height: 160px; overflow: hidden;">
-                                    <img src="@post.CoverImageUrl" alt="@post.Title" style="width: 100%; height: 100%; object-fit: cover;" />
-                                </div>
-                            }
-                            else
-                            {
-                                <div style="background: var(--neutral-layer-3); border-radius: 4px; height: 120px; display: flex; align-items: center; justify-content: center;">
-                                    <FluentIcon Value="@(new Icons.Regular.Size48.DocumentText())" Color="Color.Neutral" />
-                                </div>
-                            }
-                            <FluentLabel Typo="Typography.H6">@post.Title</FluentLabel>
-                            @if (post.PublishedAt.HasValue)
-                            {
-                                <FluentLabel Typo="Typography.Body" Style="color: var(--neutral-foreground-hint); font-size: 0.85em;">
-                                    @post.PublishedAt.Value.ToString("MMMM dd, yyyy")
-                                </FluentLabel>
-                            }
-                            @if (!string.IsNullOrEmpty(post.Summary))
-                            {
-                                <FluentLabel Typo="Typography.Body" Style="flex: 1; color: var(--neutral-foreground-hint);">
-                                    @post.Summary
-                                </FluentLabel>
-                            }
-                            <div style="margin-top: 8px;">
-                                <FluentButton Appearance="Appearance.Accent"
-                                              OnClick="@(() => ViewPost(post.PostNumber, post.Slug))"
-                                              IconStart="@(new Icons.Regular.Size16.ArrowRight())">
-                                    @L["ReadMore"]
-                                </FluentButton>
-                            </div>
-                        </div>
-                    </FluentCard>
-                </FluentGridItem>
+                <time class="post-date">@post.PublishedAt.Value.ToString("MMMM dd, yyyy")</time>
             }
-        </FluentGrid>
+            @if (!string.IsNullOrEmpty(post.Summary))
+            {
+                <p class="post-summary">@post.Summary</p>
+            }
+        </article>
     }
-</FluentCard>
+}
+
+<style>
+    .post-item {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--neutral-stroke-divider-rest);
+        cursor: pointer;
+    }
+
+    .post-item:last-child {
+        border-bottom: none;
+    }
+
+    .post-item:hover .post-title {
+        color: var(--accent-fill-rest);
+    }
+
+    .post-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: var(--neutral-foreground-rest);
+        transition: color 0.15s;
+    }
+
+    .post-date {
+        font-size: 0.85rem;
+        color: var(--neutral-foreground-hint);
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .post-summary {
+        color: var(--neutral-foreground-hint);
+        margin: 0;
+        line-height: 1.5;
+    }
+</style>
 
 @code {
     private List<BlogPostDto> _posts = new();

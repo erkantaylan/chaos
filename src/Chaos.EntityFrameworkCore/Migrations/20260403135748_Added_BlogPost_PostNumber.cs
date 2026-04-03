@@ -19,20 +19,6 @@ namespace Chaos.Migrations
                 defaultValue: 0)
                 .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            // Assign sequential PostNumber to existing rows before adding unique index
-            migrationBuilder.Sql(
-                """
-                WITH numbered AS (
-                    SELECT "Id", ROW_NUMBER() OVER (ORDER BY "CreationTime") AS rn
-                    FROM "AppBlogPosts"
-                )
-                UPDATE "AppBlogPosts" SET "PostNumber" = numbered.rn
-                FROM numbered WHERE "AppBlogPosts"."Id" = numbered."Id";
-
-                SELECT setval(pg_get_serial_sequence('"AppBlogPosts"', 'PostNumber'),
-                    GREATEST((SELECT MAX("PostNumber") FROM "AppBlogPosts"), 1));
-                """);
-
             migrationBuilder.CreateIndex(
                 name: "IX_AppBlogPosts_PostNumber",
                 table: "AppBlogPosts",
