@@ -2,6 +2,7 @@
   "Culture": "tr",
   "Texts": {
     "Menu:Blog": "Blog",
+    "Menu:ManagePosts": "Yazilari Yonet",
     "Blog": "Blog",
     "BlogPosts": "Blog Yazilari",
     "BlogPost": "Blog Yazisi",

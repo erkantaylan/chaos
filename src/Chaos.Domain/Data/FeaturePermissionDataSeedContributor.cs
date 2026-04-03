@@ -33,7 +33,12 @@ public class FeaturePermissionDataSeedContributor : IDataSeedContributor, ITrans
             "Chaos.Shopping",
             "Chaos.Shopping.Create",
             "Chaos.Shopping.Edit",
-            "Chaos.Shopping.Delete"
+            "Chaos.Shopping.Delete",
+            // Blog permissions
+            "Chaos.Blog",
+            "Chaos.Blog.Create",
+            "Chaos.Blog.Edit",
+            "Chaos.Blog.Delete"
         };
 
         await _permissionDataSeeder.SeedAsync(

@@ -20,6 +20,7 @@
     <PackageReference Include="Volo.Abp.Autofac" />
     <ProjectReference Include="..\Chaos.EntityFrameworkCore\Chaos.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Chaos.Application.Contracts\Chaos.Application.Contracts.csproj" />
+    <ProjectReference Include="..\features\Chaos.Features.Blog\Chaos.Features.Blog.csproj" />
     <ProjectReference Include="..\Chaos.ServiceDefaults\Chaos.ServiceDefaults.csproj" />
   </ItemGroup>
 

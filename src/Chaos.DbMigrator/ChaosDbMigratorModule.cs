@@ -7,7 +7,8 @@ namespace Chaos.DbMigrator;
 [DependsOn(
     typeof(AbpAutofacModule),
     typeof(ChaosEntityFrameworkCoreModule),
-    typeof(ChaosApplicationContractsModule)
+    typeof(ChaosApplicationContractsModule),
+    typeof(BlogFeatureModule)
 )]
 public class ChaosDbMigratorModule : AbpModule
 {
