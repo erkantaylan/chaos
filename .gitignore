@@ -254,17 +254,8 @@ paket-files/
 # ABP Studio
 **/.abpstudio/
 
-# LayeredDemo
-src/LayeredDemo.Web/Logs/*
-src/LayeredDemo.Web.Host/Logs/*
-src/LayeredDemo.Web.Public/Logs/*
-src/LayeredDemo.Web.Public.Host/Logs/*
-src/LayeredDemo.AuthServer/Logs/*
-src/LayeredDemo.HttpApi.Host/Logs/*
-src/LayeredDemo.HttpApi.HostWithIds/Logs/*
-src/LayeredDemo.DbMigrator/Logs/*
-src/LayeredDemo.Blazor/Logs/*
-src/LayeredDemo.Blazor.Tiered/Logs/*
+# Logs
+**/Logs/
 
 # ABP client libs — committed so no need to run abp install-libs
 # **/wwwroot/libs/*
